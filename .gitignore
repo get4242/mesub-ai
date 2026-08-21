@@ -1,0 +1,32 @@
+# dependencies
+/node_modules
+/.pnpm-store
+/.pnp
+.pnp.*
+
+# tests and builds
+/coverage
+/.next
+/out
+
+# local environments and secrets
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel
+
+# Supabase local state
+/supabase/.branches
+/supabase/.temp
+/supabase/.env.cloud-test
+
+# OS/editor
+.DS_Store
+Thumbs.db
+*.log
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
