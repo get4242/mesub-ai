@@ -28,3 +28,5 @@ jobs:
       - run: pnpm lint
       - run: pnpm build
       - run: pnpm security:audit
+      # Cloud migration/RLS verification runs only in a protected environment with
+      # dedicated Development credentials; CI never embeds or defaults to Production.

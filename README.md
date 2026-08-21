@@ -2,12 +2,12 @@
 
 Mesub AI is a multi-agent, multi-tenant property platform for Web and LINE OA.
 
-The repository is currently authorized through **Phase 0 only**. The governing documents are:
+The repository implements the approved **Phase 1 Agent and Property Core**. The governing documents are:
 
 - `PROJECT_CONSTITUTION_MESUB_AI.md` Version 1.2
 - `MESUB_AI_V1_TECHNICAL_BLUEPRINT.md` Version 0.2 Final Blueprint
 
-Phase 1 product development must not begin without explicit approval.
+Phase 2 remains out of scope until explicit approval.
 
 ## Requirements
 
@@ -19,8 +19,10 @@ Phase 1 product development must not begin without explicit approval.
 
 1. Install dependencies with `pnpm install --frozen-lockfile`.
 2. Copy `.env.example` to `.env.local` and replace every placeholder.
-3. Start Supabase with `pnpm db:start`.
-4. Reset/apply migrations with `pnpm db:reset`.
-5. Start Next.js with `pnpm dev`.
+3. Put dedicated Cloud Development credentials in ignored `.env.cloud-test`.
+4. Run `pnpm db:guard:dev` before every linked database operation.
+5. Apply migrations only to Development with `pnpm db:push:dev`.
+6. Run `pnpm db:test:phase1:dev` and `pnpm db:test:integration:phase1:dev`.
+7. Start Next.js with `pnpm dev`.
 
-See `docs/architecture/phase-0-foundation.md` for boundaries and verification commands.
+See `docs/architecture/phase-1-agent-property-core.md` and `docs/security/phase-1-checklist.md`.

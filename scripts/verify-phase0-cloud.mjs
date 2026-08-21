@@ -81,15 +81,18 @@ try {
   const userB = await signup("B");
 
   for (const user of [userA, userB]) {
-    const [profile, tenant, membership] = await Promise.all([
+    const [profile, tenant, membership, agentProfile] = await Promise.all([
       rest(`profiles?select=user_id&user_id=eq.${user.id}`, { admin: true }),
       rest(`tenants?select=id,type,created_by_user_id&created_by_user_id=eq.${user.id}`, { admin: true }),
       rest(`tenant_memberships?select=tenant_id,user_id,role,status&user_id=eq.${user.id}`, { admin: true }),
+      rest(`agent_profiles?select=id,tenant_id,user_id&user_id=eq.${user.id}`, { admin: true }),
     ]);
     assert(profile.ok && profile.data.length === 1, "signup creates exactly one profile");
     assert(tenant.ok && tenant.data.length === 1 && tenant.data[0].type === "personal", "signup creates exactly one personal tenant");
     assert(membership.ok && membership.data.length === 1 && membership.data[0].role === "owner" && membership.data[0].status === "active", "signup creates exactly one active owner membership");
+    assert(agentProfile.ok && agentProfile.data.length === 1, "signup creates exactly one agent profile");
     user.tenantId = tenant.data[0].id;
+    assert(agentProfile.data[0].tenant_id === user.tenantId, "agent profile belongs to the personal tenant");
   }
 
   const ownRows = await rest("tenants?select=id", { token: userA.token });

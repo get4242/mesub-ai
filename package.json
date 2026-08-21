@@ -20,7 +20,9 @@
     "db:link:dev": "pnpm db:guard:dev && supabase link --project-ref %SUPABASE_DEV_PROJECT_REF%",
     "db:push:dev": "pnpm db:guard:dev && supabase db push --linked",
     "db:test:dev": "pnpm db:guard:dev && supabase db query --linked --file supabase/tests/phase0_identity_tenancy_rls_test.sql",
-    "db:test:integration:dev": "pnpm db:guard:dev && node scripts/verify-phase0-cloud.mjs"
+    "db:test:integration:dev": "pnpm db:guard:dev && node scripts/verify-phase0-cloud.mjs",
+    "db:test:phase1:dev": "node --env-file=.env.cloud-test scripts/run-phase1-pgtap.mjs",
+    "db:test:integration:phase1:dev": "node --env-file=.env.cloud-test scripts/verify-phase1-cloud.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.4",
