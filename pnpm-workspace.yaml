@@ -2,3 +2,5 @@ strictDepBuilds: true
 confirmModulesPurge: false
 allowBuilds:
   unrs-resolver: true
+minimumReleaseAgeExclude:
+  - openai@7.8.0

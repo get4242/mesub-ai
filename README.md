@@ -26,3 +26,6 @@ Phase 2 remains out of scope until explicit approval.
 7. Start Next.js with `pnpm dev`.
 
 See `docs/architecture/phase-1-agent-property-core.md` and `docs/security/phase-1-checklist.md`.
+# Phase 2 AI-assisted intake
+
+Development verification: `pnpm db:test:phase2:dev` and `pnpm db:test:integration:phase2:dev`. These commands require ignored Development credentials and refuse the configured Production project.

@@ -16,18 +16,21 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "security:audit": "pnpm audit --prod --audit-level=high",
-    "db:guard:dev": "node scripts/assert-supabase-development.mjs",
+    "db:guard:dev": "node --env-file=.env.cloud-test scripts/assert-supabase-development.mjs",
     "db:link:dev": "pnpm db:guard:dev && supabase link --project-ref %SUPABASE_DEV_PROJECT_REF%",
     "db:push:dev": "pnpm db:guard:dev && supabase db push --linked",
     "db:test:dev": "pnpm db:guard:dev && supabase db query --linked --file supabase/tests/phase0_identity_tenancy_rls_test.sql",
     "db:test:integration:dev": "pnpm db:guard:dev && node scripts/verify-phase0-cloud.mjs",
     "db:test:phase1:dev": "node --env-file=.env.cloud-test scripts/run-phase1-pgtap.mjs",
     "db:test:integration:phase1:dev": "node --env-file=.env.cloud-test scripts/verify-phase1-cloud.mjs"
+    ,"db:test:phase2:dev": "node --env-file=.env.cloud-test scripts/run-phase2-pgtap.mjs"
+    ,"db:test:integration:phase2:dev": "node --env-file=.env.cloud-test scripts/verify-phase2-cloud.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.4",
     "@supabase/supabase-js": "2.112.3",
     "next": "16.3.1",
+    "openai": "7.8.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "server-only": "0.0.1",

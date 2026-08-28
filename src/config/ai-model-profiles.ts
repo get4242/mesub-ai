@@ -16,6 +16,8 @@ export type AiModelProfiles = {
   fallback: string;
 };
 
+export type Phase2AiTask = "extraction" | "vision" | "content" | "fallback";
+
 export function parseAiModelProfiles(input: Record<string, string | undefined>): AiModelProfiles {
   const env = aiModelProfileEnvSchema.parse(input);
 
@@ -26,4 +28,8 @@ export function parseAiModelProfiles(input: Record<string, string | undefined>):
     content: env.OPENAI_MODEL_CONTENT,
     fallback: env.OPENAI_MODEL_FALLBACK
   };
+}
+
+export function resolveAiModelProfile(profiles: AiModelProfiles, task: Phase2AiTask): string {
+  return profiles[task];
 }
