@@ -25,6 +25,8 @@
     "db:test:integration:phase1:dev": "node --env-file=.env.cloud-test scripts/verify-phase1-cloud.mjs"
     ,"db:test:phase2:dev": "node --env-file=.env.cloud-test scripts/run-phase2-pgtap.mjs"
     ,"db:test:integration:phase2:dev": "node --env-file=.env.cloud-test scripts/verify-phase2-cloud.mjs"
+    ,"db:test:phase3:dev": "node --env-file=.env.cloud-test scripts/run-phase3-pgtap.mjs"
+    ,"db:test:integration:phase3:dev": "node --env-file=.env.cloud-test scripts/verify-phase3-cloud.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.4",

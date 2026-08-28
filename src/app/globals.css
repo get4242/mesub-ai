@@ -31,3 +31,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .dashboard > nav form { margin-left: auto; }
 .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1rem 0; }
 @media (max-width: 600px) { .dashboard > nav { flex-wrap: wrap; } main, section { padding: 1rem; } }
+.public-search { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .75rem; margin: 1.5rem 0; align-items: end; }
+.public-search label { display: grid; gap: .35rem; }
+.property-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; padding: 0; list-style: none; }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: .5rem 1rem; }
+dt { font-weight: 700; }

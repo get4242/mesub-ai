@@ -9,3 +9,10 @@ export function propertyMutationMessage(code: string) {
   if (code === "INVALID_INPUT") return "กรุณาตรวจสอบข้อมูลและแก้ไขช่องที่ไม่ถูกต้อง";
   return "บันทึกไม่สำเร็จ กรุณาลองใหม่";
 }
+
+export function publicationMessage(code: string) {
+  if (code === "QUOTA_EXCEEDED") return "ถึงขีดจำกัดแพ็กเกจ Free แล้ว ร่างของคุณยังอยู่ครบ กรุณาปิดประกาศที่ขายแล้วหรือรอการอัปเกรดแพ็กเกจ";
+  if (code === "VALIDATION_FAILED") return "ต้องยืนยันข้อมูลเวอร์ชันล่าสุดและแก้ข้อมูลที่ยังไม่ครบก่อนเผยแพร่";
+  if (code === "CONFLICT") return "ข้อมูลเปลี่ยนแปลงแล้ว กรุณาโหลดหน้าใหม่ก่อนเผยแพร่";
+  return "ไม่สามารถเผยแพร่ได้ในขณะนี้";
+}
