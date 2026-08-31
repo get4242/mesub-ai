@@ -164,47 +164,90 @@ export function PropertyEditor({
 
   return (
     <>
-      <p><Link href={`/dashboard/properties/${property.id}/ai`}>ให้ AI ช่วยจัดข้อมูล</Link></p>
-      <form action={save} className="panel">
-        <label htmlFor="title">ชื่อทรัพย์</label>
-        <input id="title" name="title" defaultValue={property.title} required />
-        <label htmlFor="description">รายละเอียด</label>
-        <textarea
-          id="description"
-          name="description"
-          defaultValue={property.description}
-          required
-        />
-        <label htmlFor="province">จังหวัด</label>
-        <input
-          id="province"
-          name="province"
-          defaultValue={property.province}
-          required
-        />
-        <label htmlFor="district">อำเภอ/เขต</label>
-        <input
-          id="district"
-          name="district"
-          defaultValue={property.district}
-          required
-        />
-        <label htmlFor="subdistrict">ตำบล/แขวง</label>
-        <input
-          id="subdistrict"
-          name="subdistrict"
-          defaultValue={property.subdistrict ?? ""}
-        />
-        <label htmlFor="price">ราคา</label>
-        <input
-          id="price"
-          name="price"
-          defaultValue={String(property.price)}
-          required
-        />
-        <button disabled={pending}>
-          {pending ? "กำลังบันทึก…" : "บันทึกการแก้ไข"}
-        </button>
+      <form action={save} className="property-form">
+        <section className="form-section">
+          <header>
+            <i className="step-number">1</i>
+            <div>
+              <h2>ข้อมูลพื้นฐานของทรัพย์</h2>
+              <span className="hint">ชื่อที่ลูกค้าจะเห็นในประกาศ</span>
+            </div>
+          </header>
+          <label className="field">
+            <span>ชื่อทรัพย์</span>
+            <input name="title" defaultValue={property.title} required />
+          </label>
+        </section>
+        <section className="form-section">
+          <header>
+            <i className="step-number">2</i>
+            <div>
+              <h2>ราคาและทำเล</h2>
+              <span className="hint">ตรวจข้อมูลสำคัญก่อนยืนยัน</span>
+            </div>
+          </header>
+          <div className="form-grid">
+            <label className="field">
+              <span>ราคา</span>
+              <input
+                name="price"
+                defaultValue={String(property.price)}
+                required
+              />
+            </label>
+            <label className="field">
+              <span>จังหวัด</span>
+              <input
+                name="province"
+                defaultValue={property.province}
+                required
+              />
+            </label>
+            <label className="field">
+              <span>อำเภอ / เขต</span>
+              <input
+                name="district"
+                defaultValue={property.district}
+                required
+              />
+            </label>
+            <label className="field">
+              <span>ตำบล / แขวง</span>
+              <input
+                name="subdistrict"
+                defaultValue={property.subdistrict ?? ""}
+              />
+            </label>
+          </div>
+        </section>
+        <section className="form-section">
+          <header>
+            <i className="step-number">3</i>
+            <div>
+              <h2>รายละเอียดทรัพย์</h2>
+              <span className="hint">แก้ไขข้อความตามข้อมูลที่คุณยืนยันได้</span>
+            </div>
+          </header>
+          <label className="field">
+            <span>รายละเอียด</span>
+            <textarea
+              name="description"
+              defaultValue={property.description}
+              required
+            />
+          </label>
+        </section>
+        <footer className="sticky-actions">
+          <Link
+            className="button-secondary"
+            href={`/dashboard/properties/${property.id}/ai`}
+          >
+            ✦ ให้ AI ช่วยจัดข้อมูล
+          </Link>
+          <button disabled={pending}>
+            {pending ? "กำลังบันทึก…" : "บันทึกการเปลี่ยนแปลง"}
+          </button>
+        </footer>
       </form>
       <div className="actions">
         {property.status === "draft" ? (
@@ -225,36 +268,62 @@ export function PropertyEditor({
         </button>
       </div>
       {message ? <p role="status">{message}</p> : null}
-      <section id="media">
-        <h2>รูปภาพ</h2>
-        <label htmlFor="mediaFile">เพิ่มรูป JPEG, PNG หรือ WebP</label>
-        <input
-          id="mediaFile"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          disabled={pending || media.length >= 20}
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) void upload(file);
-          }}
-        />
-        <ol>
+      <section className="form-section" id="media">
+        <header>
+          <i className="step-number">4</i>
+          <div>
+            <h2>รูปภาพทรัพย์</h2>
+            <span className="hint">รูปแรกคือภาพปก · {media.length}/20 รูป</span>
+          </div>
+        </header>
+        <label className="field" htmlFor="mediaFile">
+          <span>เพิ่มรูป JPEG, PNG หรือ WebP</span>
+          <input
+            id="mediaFile"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            disabled={pending || media.length >= 20}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void upload(file);
+            }}
+          />
+        </label>
+        <div className="media-grid">
           {media.map((row, index) => (
-            <li key={row.id}>
-              {row.original_filename} ({row.status}){" "}
-              <button onClick={() => move(index, -1)} disabled={index === 0}>
-                เลื่อนขึ้น
-              </button>
-              <button
-                onClick={() => move(index, 1)}
-                disabled={index === media.length - 1}
-              >
-                เลื่อนลง
-              </button>
-              <button onClick={() => archiveMedia(row.id)}>นำออก</button>
-            </li>
+            <article
+              className={`media-card ${index === 0 ? "cover" : ""}`}
+              key={row.id}
+            >
+              <div className="media-placeholder">
+                {index === 0 ? "ภาพปก" : "รูปทรัพย์"}
+              </div>
+              <div className="media-meta">
+                <b>{row.original_filename}</b>
+                <span className="muted">{row.status}</span>
+              </div>
+              <div className="media-actions">
+                <button
+                  type="button"
+                  onClick={() => move(index, -1)}
+                  disabled={index === 0}
+                >
+                  เลื่อนขึ้น
+                </button>
+                <button
+                  type="button"
+                  onClick={() => move(index, 1)}
+                  disabled={index === media.length - 1}
+                >
+                  เลื่อนลง
+                </button>
+                <button type="button" onClick={() => archiveMedia(row.id)}>
+                  นำออก
+                </button>
+              </div>
+            </article>
           ))}
-        </ol>
+        </div>
       </section>
     </>
   );

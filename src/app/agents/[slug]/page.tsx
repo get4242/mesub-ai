@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { toPublicAgentProfile } from "@/features/agents/public-disclosure";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { PublicShell } from "@/components/public-shell";
 
 export default async function PublicAgentPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -10,5 +11,25 @@ export default async function PublicAgentPage({ params }: { params: Promise<{ sl
   const { data: identity } = await supabase.from("profiles").select("status").eq("user_id", row.user_id).maybeSingle();
   if (!identity || identity.status !== "active") notFound();
   const agent = toPublicAgentProfile(row);
-  return <main><article className="panel"><h1>{agent.displayName}</h1>{agent.brandName ? <p>{agent.brandName}</p> : null}{agent.bio ? <p>{agent.bio}</p> : null}{agent.verified ? <p>ยืนยันตัวตนแล้ว</p> : null}{agent.email ? <a href={`mailto:${agent.email}`}>{agent.email}</a> : null}{agent.phone ? <a href={`tel:${agent.phone}`}>{agent.phone}</a> : null}</article></main>;
+  return (
+    <PublicShell>
+      <main className="public-main">
+        <article className="card agent-public-profile">
+          <span className="eyebrow">โปรไฟล์ Agent</span>
+          <h1>{agent.displayName}</h1>
+          {agent.brandName ? <p className="lead-copy">{agent.brandName}</p> : null}
+          {agent.verified ? <span className="status-badge status-published">ยืนยันตัวตนแล้ว</span> : null}
+          {agent.bio ? <p>{agent.bio}</p> : null}
+          {agent.email || agent.phone ? (
+            <div className="profile-contact-list" aria-label="ช่องทางติดต่อที่ Agent เปิดเผย">
+              {agent.email ? <a className="button-secondary" href={`mailto:${agent.email}`}>อีเมล</a> : null}
+              {agent.phone ? <a className="button" href={`tel:${agent.phone}`}>โทรหา Agent</a> : null}
+            </div>
+          ) : (
+            <p className="muted">Agent ยังไม่ได้เปิดเผยช่องทางติดต่อสาธารณะ</p>
+          )}
+        </article>
+      </main>
+    </PublicShell>
+  );
 }

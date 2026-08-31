@@ -1,7 +1,81 @@
 import { updateAgentProfileFormAction } from "@/features/agents/actions";
 import { getOwnAgentProfile } from "@/features/agents/queries";
-
 export default async function ProfilePage() {
   const profile = await getOwnAgentProfile();
-  return <section><h1>โปรไฟล์ Agent</h1><form action={updateAgentProfileFormAction} className="panel"><label htmlFor="publicDisplayName">ชื่อที่แสดง</label><input id="publicDisplayName" name="publicDisplayName" defaultValue={profile.public_display_name} required /><label htmlFor="slug">Slug</label><input id="slug" name="slug" defaultValue={profile.slug} required /><label htmlFor="brandName">แบรนด์</label><input id="brandName" name="brandName" defaultValue={profile.brand_name ?? ""} /><label htmlFor="bio">แนะนำตัว</label><textarea id="bio" name="bio" defaultValue={profile.bio ?? ""} /><label htmlFor="publicEmail">อีเมลสาธารณะ</label><input id="publicEmail" name="publicEmail" type="email" defaultValue={profile.public_email ?? ""} /><label><input name="showEmail" type="checkbox" defaultChecked={profile.show_email} /> แสดงอีเมล</label><label htmlFor="publicPhone">โทรศัพท์สาธารณะ</label><input id="publicPhone" name="publicPhone" defaultValue={profile.public_phone ?? ""} /><label><input name="showPhone" type="checkbox" defaultChecked={profile.show_phone} /> แสดงโทรศัพท์</label><button type="submit">บันทึกโปรไฟล์</button></form></section>;
+  return (
+    <>
+      <header className="agent-topbar">
+        <h1>โปรไฟล์ของฉัน</h1>
+      </header>
+      <main className="agent-content">
+        <div className="page-head">
+          <h1>ข้อมูล Agent</h1>
+          <p>เลือกข้อมูลที่ต้องการแสดงต่อสาธารณะ</p>
+        </div>
+        <form action={updateAgentProfileFormAction} className="property-form">
+          <section className="form-section">
+            <div className="form-grid">
+              <label className="field">
+                <span>ชื่อที่แสดง</span>
+                <input
+                  name="publicDisplayName"
+                  defaultValue={profile.public_display_name}
+                  required
+                />
+              </label>
+              <label className="field">
+                <span>ชื่อสำหรับ URL</span>
+                <input name="slug" defaultValue={profile.slug} required />
+              </label>
+              <label className="field full">
+                <span>แบรนด์</span>
+                <input
+                  name="brandName"
+                  defaultValue={profile.brand_name ?? ""}
+                />
+              </label>
+              <label className="field full">
+                <span>แนะนำตัว</span>
+                <textarea name="bio" defaultValue={profile.bio ?? ""} />
+              </label>
+              <label className="field">
+                <span>อีเมลสาธารณะ</span>
+                <input
+                  name="publicEmail"
+                  type="email"
+                  defaultValue={profile.public_email ?? ""}
+                />
+                <span>
+                  <input
+                    name="showEmail"
+                    type="checkbox"
+                    defaultChecked={profile.show_email}
+                  />{" "}
+                  แสดงอีเมล
+                </span>
+              </label>
+              <label className="field">
+                <span>โทรศัพท์สาธารณะ</span>
+                <input
+                  name="publicPhone"
+                  defaultValue={profile.public_phone ?? ""}
+                />
+                <span>
+                  <input
+                    name="showPhone"
+                    type="checkbox"
+                    defaultChecked={profile.show_phone}
+                  />{" "}
+                  แสดงโทรศัพท์
+                </span>
+              </label>
+            </div>
+          </section>
+          <footer className="sticky-actions">
+            <button>บันทึกโปรไฟล์</button>
+          </footer>
+        </form>
+      </main>
+    </>
+  );
 }

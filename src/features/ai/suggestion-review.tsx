@@ -39,7 +39,7 @@ export function SuggestionReview({
     setPending(null);
   }
   return (
-    <section>
+    <section className="card">
       <h2>ตรวจคำแนะนำ</h2>
       {(
         [
@@ -50,17 +50,21 @@ export function SuggestionReview({
         <div key={title}>
           <h3>{title}</h3>
           {items.map((s) => (
-            <article key={s.id}>
-              <strong>{s.fieldKey}</strong>
-              <p>
-                {s.value === null ? "AI ไม่พบหลักฐานเพียงพอ" : String(s.value)}
-              </p>
-              <details>
-                <summary>แหล่งข้อมูล</summary>
-                {s.sourceIds.length ? s.sourceIds.join(", ") : "ไม่มี"}
-              </details>
+            <article className="suggestion" key={s.id}>
+              <div>
+                <strong>{s.fieldKey}</strong>
+                <p>
+                  {s.value === null
+                    ? "AI ไม่พบหลักฐานเพียงพอ"
+                    : String(s.value)}
+                </p>
+                <details>
+                  <summary>แหล่งข้อมูล</summary>
+                  {s.sourceIds.length ? s.sourceIds.join(", ") : "ไม่มี"}
+                </details>
+              </div>
               {!s.decision || s.decision === "pending" ? (
-                <div>
+                <div className="suggestion-actions">
                   <button
                     disabled={pending === s.id}
                     onClick={() => void decide(s, "accept")}

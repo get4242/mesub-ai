@@ -46,39 +46,51 @@ export default async function PropertyAiPage({
     });
   }
   return (
-    <main>
-      <h1>AI ช่วยจัดข้อมูลทรัพย์</h1>
-      <AiIntakePanel
-        media={media.filter((row) => row.status === "ready")}
-        submit={submit}
-      />
-      {runs[0] ? (
-        <AiRunStatus
-          runId={runs[0].id}
-          state={runs[0].state}
-          retryable={runs[0].retryable}
-        />
-      ) : null}
-      <SuggestionReview
-        propertyVersion={property.version}
-        suggestions={suggestions.map((row) => ({
-          id: row.id,
-          fieldKey: row.field_key,
-          value: row.proposed_value,
-          confidence: row.confidence,
-          decision: row.decision,
-          sourceIds: (row.ai_suggestion_sources ?? []).map(
-            (source: { source_id: string }) => source.source_id,
-          ),
-        }))}
-      />
-      <ConfirmationPanel
-        blocked={suggestions.some(
-          (row) =>
-            row.validation_status === "invalid" && row.decision === "pending",
-        )}
-        confirm={confirm}
-      />
-    </main>
+    <>
+      <header className="agent-topbar">
+        <h1>AI ช่วยจัดข้อมูลทรัพย์</h1>
+      </header>
+      <main className="agent-content">
+        <div className="steps">
+          <span className="active">1 · ส่งข้อมูลให้ AI</span>
+          <span>2 · ตรวจคำแนะนำ</span>
+          <span>3 · ยืนยันข้อมูล</span>
+        </div>
+        <div className="ai-workspace">
+          <AiIntakePanel
+            media={media.filter((row) => row.status === "ready")}
+            submit={submit}
+          />
+          {runs[0] ? (
+            <AiRunStatus
+              runId={runs[0].id}
+              state={runs[0].state}
+              retryable={runs[0].retryable}
+            />
+          ) : null}
+          <SuggestionReview
+            propertyVersion={property.version}
+            suggestions={suggestions.map((row) => ({
+              id: row.id,
+              fieldKey: row.field_key,
+              value: row.proposed_value,
+              confidence: row.confidence,
+              decision: row.decision,
+              sourceIds: (row.ai_suggestion_sources ?? []).map(
+                (source: { source_id: string }) => source.source_id,
+              ),
+            }))}
+          />
+          <ConfirmationPanel
+            blocked={suggestions.some(
+              (row) =>
+                row.validation_status === "invalid" &&
+                row.decision === "pending",
+            )}
+            confirm={confirm}
+          />
+        </div>
+      </main>
+    </>
   );
 }

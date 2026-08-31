@@ -13,8 +13,8 @@ export function AiRunStatus({
 }) {
   const [message, setMessage] = useState("");
   return (
-    <section aria-live="polite">
-      <h2>สถานะงาน AI</h2>
+    <section className="card" aria-live="polite">
+      <h2>กำลังช่วยจัดข้อมูล</h2>
       <p>{runStatusCopy(state)}</p>
       {retryable ? (
         <button
