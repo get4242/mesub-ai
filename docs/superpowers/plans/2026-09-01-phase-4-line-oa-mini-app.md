@@ -1,6 +1,6 @@
 # Phase 4 Implementation Plan — LINE OA + LINE MINI App Integration
 
-> **Status:** Proposed. Do not implement until the Specification and all Approval Gates are approved.
+> **Status:** Development implementation complete and baseline commit approved. Production and real LINE channel setup remain gated.
 
 **Goal:** Add LINE channels around the existing Mesub web codebase and Phase 0–3 backend.
 **Spec:** `docs/keystone/specs/2026-09-01-phase-4-line-oa-mini-app.md`
@@ -124,4 +124,4 @@
 
 ## Approval checkpoint
 
-Implementation is blocked pending the eleven gates in Specification “Approval gates.” After approval, use TDD implementation. This plan authorizes no Phase 4 code, migration, LINE channel mutation, commit, push, or Production access.
+The eleven Specification gates and Phase 4 Development baseline commit were approved. LINE Console/channel mutation, Production access, and push remain separately gated.

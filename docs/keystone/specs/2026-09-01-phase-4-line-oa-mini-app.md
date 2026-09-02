@@ -1,8 +1,8 @@
 # Phase 4 Specification — LINE OA + LINE MINI App Integration
 
-**Status:** Proposed for approval
+**Status:** Implemented and approved for the Phase 4 Development baseline; real LINE smoke test remains gated
 **Date:** 2026-09-01
-**Scope:** Architecture/product planning only. No implementation, migration, LINE channel, Cloud, or Production change.
+**Scope:** Development-only LINE integration on the existing Mesub web/backend; no Production LINE channel or Production access.
 
 ## Goal and success
 
@@ -109,7 +109,7 @@ Webhook flow:
 
 Each has distinct IDs, secrets/tokens, webhook/endpoint/callback URLs, link namespace, and allowlists. Credentials are server-only environment variables.
 
-## Proposed persistence — migration approval required
+## Approved additive persistence — Development only
 
 - `line_identity_links`: provider/environment subject reference, internal user, status, consent, revocation.
 - `line_link_challenges`: hashed one-time challenge/nonce, session binding, expiry/consumption.

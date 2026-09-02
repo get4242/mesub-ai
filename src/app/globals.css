@@ -918,3 +918,17 @@ button {
     transition: none !important;
   }
 }
+.line-account-card {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+.line-account-card p { max-width: 680px; }
+.line-account-actions { display: flex; flex-direction: column; gap: 10px; min-width: 220px; }
+@media (max-width: 700px) {
+  .line-account-card { align-items: stretch; flex-direction: column; }
+  .line-account-card button { min-height: 48px; width: 100%; }
+}

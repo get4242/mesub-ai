@@ -26,9 +26,12 @@ values
   ('00000000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'agent-a@example.com', '', now()),
   ('00000000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'agent-b@example.com', '', now());
 
-select is((select count(*) from public.profiles), 2::bigint, 'signup creates a profile for each user');
-select is((select count(*) from public.tenants), 2::bigint, 'signup creates one personal tenant for each user');
-select is((select count(*) from public.tenant_memberships), 2::bigint, 'signup creates one owner membership for each user');
+select is((select count(*) from public.profiles where user_id in
+  ('00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002')), 2::bigint, 'signup creates a profile for each fixture user');
+select is((select count(*) from public.tenants where created_by_user_id in
+  ('00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002')), 2::bigint, 'signup creates one personal tenant for each fixture user');
+select is((select count(*) from public.tenant_memberships where user_id in
+  ('00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002')), 2::bigint, 'signup creates one owner membership for each fixture user');
 
 set local role authenticated;
 set local "request.jwt.claims" = '{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}';

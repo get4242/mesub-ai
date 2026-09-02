@@ -1,7 +1,13 @@
 import { updateAgentProfileFormAction } from "@/features/agents/actions";
 import { getOwnAgentProfile } from "@/features/agents/queries";
+import { LineAccountCard } from "@/components/line-account-card";
+import { createClient } from "@/lib/supabase/server";
 export default async function ProfilePage() {
   const profile = await getOwnAgentProfile();
+  const supabase = await createClient();
+  const { data: link } = await supabase.from("line_identity_links").select("id").is("revoked_at", null).maybeSingle();
+  const { data: notificationConsent } = await supabase.from("line_notification_consents").select("enabled").maybeSingle();
+  const liffId = process.env.LINE_ENVIRONMENT === "production" ? null : (process.env.LINE_MINI_APP_LIFF_ID ?? null);
   return (
     <>
       <header className="agent-topbar">
@@ -75,6 +81,7 @@ export default async function ProfilePage() {
             <button>บันทึกโปรไฟล์</button>
           </footer>
         </form>
+        <LineAccountCard liffId={liffId} linked={Boolean(link)} notificationsEnabled={notificationConsent?.enabled === true} />
       </main>
     </>
   );
