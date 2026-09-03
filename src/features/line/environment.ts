@@ -12,8 +12,6 @@ const schema = z.object({
 export function parseLineEnvironment(
   input: Record<string, string | undefined>,
 ) {
-  if (input.LINE_ENVIRONMENT === "production")
-    throw new Error("LINE_PRODUCTION_FORBIDDEN");
   const value = schema.parse(input);
   return {
     ...value,

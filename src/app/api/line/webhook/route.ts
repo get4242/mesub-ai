@@ -1,19 +1,22 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { handleLineWebhook } from "@/features/line/webhook-handler";
+import { getLineServerConfig } from "@/features/line/server-config";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  const secret = process.env.LINE_MESSAGING_CHANNEL_SECRET;
-  const environment = process.env.LINE_ENVIRONMENT;
-  if (!secret || (environment !== "development" && environment !== "review"))
+  let config: ReturnType<typeof getLineServerConfig>;
+  try {
+    config = getLineServerConfig();
+  } catch {
     return Response.json({ accepted: false }, { status: 503 });
+  }
   const rawBody = await request.text();
   const admin = createAdminClient();
   const result = await handleLineWebhook(
     rawBody,
     request.headers.get("x-line-signature"),
-    { secret, environment },
+    { secret: config.messagingSecret, environment: config.environment },
     {
       async accept(input) {
         const { data, error } = await admin.rpc("accept_line_webhook_server", {

@@ -13,7 +13,7 @@ export async function completeLineLink(
     verify(rawToken: string, channelId: string): Promise<VerifyResult>;
     consumeAndLink(values: { userId: string; providerId: string; environment: string; subjectHash: string; subjectCiphertext: string; challengeHash: string }): Promise<string>;
   },
-  config: { providerId: string; environment: "development" | "review"; channelId: string; hashKey: string; encryptionKey: string },
+  config: { providerId: string; environment: "development" | "review" | "production"; channelId: string; hashKey: string; encryptionKey: string },
 ) {
   if (!input.userId || !input.rawToken || !input.challenge || !input.recentAuth || !input.consent) {
     return { ok: false as const, code: "LINK_NOT_ALLOWED" as const };

@@ -3,7 +3,7 @@ import { normalizeLineWebhook, verifyLineWebhookSignature } from "./webhook";
 export type LineWebhookRepository = {
   accept(input: {
     eventId: string;
-    environment: "development" | "review";
+    environment: "development" | "review" | "production";
     eventType: string;
     timestamp: number;
     payload: Record<string, unknown>;
@@ -14,7 +14,7 @@ export type LineWebhookRepository = {
 export async function handleLineWebhook(
   rawBody: string,
   signature: string | null,
-  config: { secret: string; environment: "development" | "review" },
+  config: { secret: string; environment: "development" | "review" | "production" },
   repository: LineWebhookRepository,
 ) {
   if (!verifyLineWebhookSignature(rawBody, signature, config.secret))

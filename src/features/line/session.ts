@@ -20,7 +20,7 @@ export function normalizeReturnPath(value: unknown) {
 }
 
 export async function resolveLineSession(
-  input: { verifiedSubject: string; providerId: string; environment: "development" | "review"; hashKey: string },
+  input: { verifiedSubject: string; providerId: string; environment: "development" | "review" | "production"; hashKey: string },
   repository: { findActiveUser(providerId: string, environment: string, subjectHash: string): Promise<string | null> },
 ) {
   const subjectHash = createSubjectHash(input.verifiedSubject, input.hashKey);

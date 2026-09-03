@@ -16,9 +16,16 @@ describe("LINE environment contract", () => {
     expect(JSON.stringify(result.publicConfig)).not.toContain("token-value");
   });
 
-  it("rejects Production in this implementation round", () => {
-    expect(() =>
-      parseLineEnvironment({ LINE_ENVIRONMENT: "production" }),
-    ).toThrow("LINE_PRODUCTION_FORBIDDEN");
+  it("accepts a complete Production LINE configuration", () => {
+    const result = parseLineEnvironment({
+      LINE_ENVIRONMENT: "production",
+      LINE_PROVIDER_ID: "provider-prod",
+      LINE_LOGIN_CHANNEL_ID: "login-prod",
+      LINE_MINI_APP_LIFF_ID: "liff-prod",
+      LINE_MESSAGING_CHANNEL_SECRET: "secret-prod",
+      LINE_MESSAGING_CHANNEL_ACCESS_TOKEN: "token-prod",
+    });
+    expect(result.environment).toBe("production");
+    expect(result.publicConfig).toEqual({ environment: "production", liffId: "liff-prod" });
   });
 });

@@ -7,7 +7,7 @@ export default async function ProfilePage() {
   const supabase = await createClient();
   const { data: link } = await supabase.from("line_identity_links").select("id").is("revoked_at", null).maybeSingle();
   const { data: notificationConsent } = await supabase.from("line_notification_consents").select("enabled").maybeSingle();
-  const liffId = process.env.LINE_ENVIRONMENT === "production" ? null : (process.env.LINE_MINI_APP_LIFF_ID ?? null);
+  const liffId = process.env.LINE_MINI_APP_LIFF_ID ?? null;
   return (
     <>
       <header className="agent-topbar">
