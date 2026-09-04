@@ -17,6 +17,7 @@
     "test:watch": "vitest",
     "security:audit": "pnpm audit --prod --audit-level=high",
     "db:guard:dev": "node --env-file=.env.cloud-test scripts/assert-supabase-development.mjs",
+    "db:audit:production": "node scripts/run-production-audit.mjs",
     "db:link:dev": "pnpm db:guard:dev && supabase link --project-ref %SUPABASE_DEV_PROJECT_REF%",
     "db:push:dev": "pnpm db:guard:dev && supabase db push --linked",
     "db:test:dev": "pnpm db:guard:dev && supabase db query --linked --file supabase/tests/phase0_identity_tenancy_rls_test.sql",

@@ -4,9 +4,11 @@ This runbook prepares the existing Phase 0–4 system for release. It does not a
 
 ## Supabase Production
 
-The owner creates a new Supabase Production project that is not mesub-ai-dev. In Supabase Dashboard, enter the Project URL, publishable key, server secret key, and project ref directly into the Vercel Production environment. Never paste them into chat or tracked files.
+The existing Supabase project previously named `mesub-ai-dev` is the approved promoted Production candidate. Its immutable project ref is pinned in `supabase/project-role.json`. Do not create a replacement project merely because the old display name contains `dev`, and do not treat that historical label as an environment authority.
 
-Before release, apply all 27 migrations in filename order, then run pgTAP, RLS, Tenant A/B isolation, storage, queue, quota, and migration parity checks. Confirm Auth callback URLs and private Storage policies use the final HTTPS domain.
+All 27 migrations are already applied. Do not rerun fixture-producing Development regressions against this project. Use `pnpm db:audit:production`, which validates its SQL as read-only and binds queries to the promoted project marker. Confirm migration parity, zero queues, RLS, private Storage, and residual-data counts before release.
+
+Enter the promoted project's URL, publishable key, server secret key, and exact project ref directly into the Vercel Production environment. Never paste them into chat or tracked files. After a Vercel Production HTTPS URL exists, update Supabase Auth Site URL and exact redirect URLs in a separately approved cloud-configuration step.
 
 ## Vercel Production
 
@@ -47,6 +49,6 @@ Enable webhook delivery and redelivery. Configure Rich Menu and deep links only 
 
 ## Release gates
 
-Run unit tests, TypeScript, ESLint, production build, dependency audit, secret scan, migration parity, pgTAP/RLS/cross-tenant tests, LINE Production isolation tests, and queue retry/dead-letter tests. Verify no localhost, tunnel, Preview URL, Development project ref, Development LINE identifier, fake driver, or secret is present in the Production deployment.
+Run unit tests, TypeScript, ESLint, production build, dependency audit, secret scan, the read-only Production audit, LINE Production isolation tests, and queue retry/dead-letter tests. Historical Supabase Development naming is allowed only for the promoted ref pinned by the marker. Verify no localhost, tunnel, Preview URL, Development LINE identifier, fake driver, or secret is present in the Production deployment.
 
 Only the owner may approve migration application, LINE Published setting changes, and the final Production deployment.

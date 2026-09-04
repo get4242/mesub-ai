@@ -1,3 +1,9 @@
+import { readFileSync } from "node:fs";
+
+const projectRole = JSON.parse(
+  readFileSync(new URL("../supabase/project-role.json", import.meta.url), "utf8"),
+);
+
 const required = [
   "SUPABASE_TARGET_ENV",
   "SUPABASE_DEV_PROJECT_REF",
@@ -12,6 +18,16 @@ if (missing.length > 0) {
 const targetEnvironment = process.env.SUPABASE_TARGET_ENV.trim().toLowerCase();
 const developmentRef = process.env.SUPABASE_DEV_PROJECT_REF.trim();
 const productionRef = process.env.SUPABASE_PRODUCTION_PROJECT_REF?.trim();
+
+if (
+  projectRole.role === "promoted-production" &&
+  developmentRef === projectRole.projectRef
+) {
+  console.error(
+    "Refusing Development operation: project is promoted-production.",
+  );
+  process.exit(1);
+}
 
 if (targetEnvironment !== "development") {
   console.error("Refusing to run: SUPABASE_TARGET_ENV must equal development.");

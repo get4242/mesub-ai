@@ -1,3 +1,4 @@
+import "./assert-supabase-development.mjs";
 import { randomUUID } from "node:crypto";
 
 const required = ["SUPABASE_DEV_PROJECT_REF", "SUPABASE_DEV_URL", "SUPABASE_DEV_PUBLISHABLE_KEY", "SUPABASE_DEV_SECRET_KEY"];
