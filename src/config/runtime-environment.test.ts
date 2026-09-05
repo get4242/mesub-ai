@@ -75,8 +75,17 @@ describe("unified runtime environment", () => {
     expect(() => parseRuntimeEnvironment({ ...production, LINE_ENVIRONMENT: "development" })).toThrow("ENVIRONMENT_MISMATCH");
   });
 
+  it("allows the same Provider ID across Developing and Published internal channels", () => {
+    const result = parseRuntimeEnvironment({
+      ...production,
+      LINE_PROVIDER_ID: production.LINE_DEVELOPMENT_PROVIDER_ID,
+    });
+
+    expect(result.line.providerId).toBe(production.LINE_DEVELOPMENT_PROVIDER_ID);
+    expect(result.line.environment).toBe("production");
+  });
+
   it.each([
-    ["LINE_PROVIDER_ID", "LINE_DEVELOPMENT_PROVIDER_ID"],
     ["LINE_LOGIN_CHANNEL_ID", "LINE_DEVELOPMENT_LOGIN_CHANNEL_ID"],
     ["LINE_MINI_APP_LIFF_ID", "LINE_DEVELOPMENT_MINI_APP_LIFF_ID"],
   ] as const)("rejects Production reuse of %s", (productionKey, developmentKey) => {

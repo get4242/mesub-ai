@@ -45,7 +45,7 @@ On Vercel Hobby, the worker endpoint remains protected and deployable but a usef
 
 ## LINE Production
 
-Under the approved Production Provider, select the Production OA Messaging API channel and Published LINE MINI App / LINE Login configuration. Enter the final Vercel HTTPS URL as the Published endpoint, the approved callback URL, and /api/line/webhook as the Messaging API webhook.
+Use the approved Mesub AI Provider for Developing, Review, and Published; a separate Production Provider is not required. Select the Production OA Messaging API channel and Published LINE MINI App configuration. `LINE_LOGIN_CHANNEL_ID` is the expected ID-token audience and must be the Published internal Channel ID for this environment, not an unrelated LINE Login channel. The Published internal Channel ID and Published LIFF ID must differ from their Developing counterparts even though the Provider ID may be the same. Enter the final Vercel HTTPS URL as the Published endpoint, the approved callback URL, and /api/line/webhook as the Messaging API webhook.
 
 Enable webhook delivery and redelivery. Configure Rich Menu and deep links only with the final HTTPS origin and Published MINI App identifiers. Server checks continue to cover token audience, expiry and nonce where applicable; exact raw-body signatures; event idempotency; explicit recent-auth account linking; active links; notification consent; and safety caps.
 

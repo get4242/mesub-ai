@@ -80,12 +80,10 @@ export function parseRuntimeEnvironment(input: Record<string, string | undefined
     if (developmentIdentifiers.some((identifier) => !identifier)) {
       throw new Error("RUNTIME_CONFIGURATION_INVALID");
     }
-    const productionIdentifiers = [
-      value.LINE_PROVIDER_ID,
-      value.LINE_LOGIN_CHANNEL_ID,
-      value.LINE_MINI_APP_LIFF_ID,
-    ];
-    if (productionIdentifiers.some((identifier, index) => identifier === developmentIdentifiers[index])) {
+    if (
+      value.LINE_LOGIN_CHANNEL_ID === value.LINE_DEVELOPMENT_LOGIN_CHANNEL_ID
+      || value.LINE_MINI_APP_LIFF_ID === value.LINE_DEVELOPMENT_MINI_APP_LIFF_ID
+    ) {
       throw new Error("DEVELOPMENT_IDENTIFIER_REUSE");
     }
   }
