@@ -5,6 +5,7 @@ import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import type { AuthActionResult } from "./schemas";
+import { Brand } from "@/components/public-shell";
 
 type Props = {
   mode: "login" | "signup";
@@ -28,7 +29,9 @@ export function AuthForm({ mode, action }: Props) {
   }, [result, router, signup]);
 
   return (
-    <form action={formAction} className="panel">
+    <div className="auth-card">
+      <Brand />
+      <form action={formAction} className="panel">
       <h1>{signup ? "สมัคร Agent" : "เข้าสู่ระบบ Agent"}</h1>
       {signup ? (
         <>
@@ -44,6 +47,7 @@ export function AuthForm({ mode, action }: Props) {
       {result?.ok && signup ? <p role="status">สมัครสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี</p> : null}
       <SubmitButton label={signup ? "สมัครสมาชิก" : "เข้าสู่ระบบ"} />
       <p>{signup ? "มีบัญชีแล้ว?" : "ยังไม่มีบัญชี?"} <Link href={signup ? "/login" : "/signup"}>{signup ? "เข้าสู่ระบบ" : "สมัครสมาชิก"}</Link></p>
-    </form>
+      </form>
+    </div>
   );
 }

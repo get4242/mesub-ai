@@ -6,6 +6,8 @@ import { processLineNotification } from "../line/process-notification";
 import { decryptLineDestination } from "../line/destination-crypto";
 import { createLineDriver } from "./runtime-drivers";
 import type { parseRuntimeEnvironment } from "../../config/runtime-environment";
+import { resolveAiModelProfile } from "../../config/ai-model-profiles";
+import type { AiProvider } from "../ai/provider/provider";
 
 type RuntimeEnvironment = ReturnType<typeof parseRuntimeEnvironment>;
 type RpcResult = { data: unknown; error: { message: string } | null };
@@ -30,7 +32,12 @@ function firstRow(value: unknown): Record<string, unknown> | null {
   return Array.isArray(value) && value[0] && typeof value[0] === "object" ? value[0] as Record<string, unknown> : null;
 }
 
-export async function runWorkerCycle(admin: WorkerAdmin, environment: RuntimeEnvironment, batchSize = 5) {
+export async function runWorkerCycle(
+  admin: WorkerAdmin,
+  environment: RuntimeEnvironment,
+  batchSize = 5,
+  dependencies: { provider?: AiProvider } = {},
+) {
   const boundedBatch = Math.max(1, Math.min(batchSize, 10));
   const summary = { ai: 0, lineWebhooks: 0, lineNotifications: 0, platformIntake: 0 };
 
@@ -43,8 +50,10 @@ export async function runWorkerCycle(admin: WorkerAdmin, environment: RuntimeEnv
     }
     let terminal = false;
     await processAiRun(message.data.runId, {
-      provider: createOpenAiGateway(),
-      maxAttempts: 3,
+      provider: dependencies.provider ?? createOpenAiGateway(),
+      maxAttempts: environment.ai.limits.maxAttempts,
+      timeoutMs: environment.ai.limits.timeoutMs,
+      maxContentCharacters: environment.ai.limits.maxContentCharacters,
       repository: {
         async claim(id) {
           const claimed = firstRow(await rpc(admin, "claim_ai_run_server", { target_run_id: id }));
@@ -54,7 +63,7 @@ export async function runWorkerCycle(admin: WorkerAdmin, environment: RuntimeEnv
             attempt: Number(claimed.attempt),
             snapshot: claimed.snapshot,
             task: String(claimed.task) as "extraction" | "vision" | "content" | "fallback",
-            model: String(claimed.model),
+            model: resolveAiModelProfile(environment.ai.models, String(claimed.task) as "extraction" | "vision" | "content" | "fallback"),
             sourceIds: Array.isArray(claimed.source_ids) ? claimed.source_ids.map(String) : [],
           };
         },

@@ -1,10 +1,11 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 export function Brand() {
   return (
     <Link className="brand" href="/">
-      <i className="brand-mark">M</i>
+      <Image className="brand-logo" src="/brand/mesub-ai-logo.png" alt="Mesub AI" width={44} height={44} sizes="44px" />
       <span>
         Mesub <b>AI</b>
       </span>

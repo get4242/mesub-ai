@@ -9,6 +9,18 @@ describe("unified runtime environment", () => {
     SUPABASE_SECRET_KEY: "sb_secret_prod",
     SUPABASE_EXPECTED_PROJECT_REF: "prodref",
     OPENAI_API_KEY: "server-openai-key",
+    OPENAI_MODEL_EXTRACTION: "gpt-5.6-luna",
+    OPENAI_MODEL_VISION: "gpt-5.6-terra",
+    OPENAI_MODEL_LINE_CONVERSATION: "gpt-5.6-luna",
+    OPENAI_MODEL_CONTENT: "gpt-5.6-terra",
+    OPENAI_MODEL_FALLBACK: "gpt-5.6-terra",
+    AI_TIMEOUT_MS: "30000",
+    AI_MAX_ATTEMPTS: "3",
+    AI_MAX_TEXT_CHARACTERS: "12000",
+    AI_MAX_IMAGES: "10",
+    AI_MAX_CONTENT_CHARACTERS: "5000",
+    AI_MAX_CONCURRENT_RUNS_PER_TENANT: "1",
+    AI_MAX_RUNS_PER_TENANT_PER_DAY: "10",
     WORKER_TRIGGER_SECRET: "worker-trigger-secret-at-least-32-characters",
     LINE_ENVIRONMENT: "production",
     LINE_PROVIDER_ID: "provider-prod",
@@ -29,10 +41,30 @@ describe("unified runtime environment", () => {
     expect(result.line.environment).toBe("production");
     expect(result.supabase.projectRef).toBe("prodref");
     expect(result.emailDelivery).toBe("disabled");
+    expect(result.ai.models).toEqual({
+      extraction: "gpt-5.6-luna",
+      vision: "gpt-5.6-terra",
+      lineConversation: "gpt-5.6-luna",
+      content: "gpt-5.6-terra",
+      fallback: "gpt-5.6-terra",
+    });
+    expect(result.ai.limits).toEqual({
+      timeoutMs: 30_000,
+      maxAttempts: 3,
+      maxTextCharacters: 12_000,
+      maxImages: 10,
+      maxContentCharacters: 5_000,
+      maxConcurrentRunsPerTenant: 1,
+      maxRunsPerTenantPerDay: 10,
+    });
   });
 
   it("rejects incomplete Production configuration", () => {
     expect(() => parseRuntimeEnvironment({ ...production, LINE_MESSAGING_CHANNEL_SECRET: "" })).toThrow("RUNTIME_CONFIGURATION_INVALID");
+  });
+
+  it("fails closed when a Production model profile is missing", () => {
+    expect(() => parseRuntimeEnvironment({ ...production, OPENAI_MODEL_VISION: "" })).toThrow("RUNTIME_CONFIGURATION_INVALID");
   });
 
   it("rejects a missing protected worker trigger secret", () => {

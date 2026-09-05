@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { parseAiModelProfiles } from "./ai-model-profiles";
+import { parseAiRuntimeLimits } from "./ai-runtime";
 
 export type AppEnvironment = "local" | "preview" | "staging" | "production";
 export type LineEnvironment = "development" | "review" | "production";
@@ -13,6 +15,18 @@ const baseSchema = z.object({
   SUPABASE_SECRET_KEY: z.string().trim().min(1),
   SUPABASE_EXPECTED_PROJECT_REF: z.string().trim().min(1).optional(),
   OPENAI_API_KEY: z.string().trim().min(1),
+  OPENAI_MODEL_EXTRACTION: z.string().trim().min(1),
+  OPENAI_MODEL_VISION: z.string().trim().min(1),
+  OPENAI_MODEL_LINE_CONVERSATION: z.string().trim().min(1),
+  OPENAI_MODEL_CONTENT: z.string().trim().min(1),
+  OPENAI_MODEL_FALLBACK: z.string().trim().min(1),
+  AI_TIMEOUT_MS: z.coerce.number().int().min(1_000).max(120_000),
+  AI_MAX_ATTEMPTS: z.coerce.number().int().min(1).max(5),
+  AI_MAX_TEXT_CHARACTERS: z.coerce.number().int().min(1).max(50_000),
+  AI_MAX_IMAGES: z.coerce.number().int().min(0).max(20),
+  AI_MAX_CONTENT_CHARACTERS: z.coerce.number().int().min(1).max(20_000),
+  AI_MAX_CONCURRENT_RUNS_PER_TENANT: z.coerce.number().int().min(1).max(10),
+  AI_MAX_RUNS_PER_TENANT_PER_DAY: z.coerce.number().int().min(1).max(1_000),
   WORKER_TRIGGER_SECRET: z.string().min(32),
   LINE_ENVIRONMENT: z.enum(["development", "review", "production"]),
   LINE_PROVIDER_ID: z.string().trim().min(1),
@@ -85,6 +99,10 @@ export function parseRuntimeEnvironment(input: Record<string, string | undefined
       projectRef,
     },
     openAiApiKey: value.OPENAI_API_KEY,
+    ai: {
+      models: parseAiModelProfiles(input),
+      limits: parseAiRuntimeLimits(input),
+    },
     workerTriggerSecret: value.WORKER_TRIGGER_SECRET,
     line: {
       environment: value.LINE_ENVIRONMENT,

@@ -5,11 +5,13 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createPostgresAiJobDispatcher } from "@/lib/queue/postgres-ai-job-dispatcher";
 import { startAiIntake, decideSuggestion } from "./action-logic";
+import { parseAiRuntimeLimits } from "@/config/ai-runtime";
 
 export async function startAiIntakeAction(input: Record<string, unknown>) {
   const context = await requireAgentContext();
   const client = await createClient();
   const admin = createAdminClient();
+  const limits = parseAiRuntimeLimits(process.env);
   const repository = {
     async getProperty(id: string, tenantId: string) {
       const { data } = await client
@@ -47,33 +49,28 @@ export async function startAiIntakeAction(input: Record<string, unknown>) {
       const traceId = crypto.randomUUID();
       const snapshot = value.snapshot as { property: { version: number } };
       const tasks = value.tasks as string[];
-      const row = {
-        tenant_id: value.tenantId,
-        property_id: value.propertyId,
-        requested_by_user_id: value.requesterUserId,
-        idempotency_key: value.idempotencyKey,
-        input_snapshot: value.snapshot,
-        input_property_version: snapshot.property.version,
-        tasks,
-        model_profile_key: tasks[0],
-        trace_id: traceId,
-      };
-      const { error } = await admin.from("ai_runs").upsert(row, {
-        onConflict: "tenant_id,idempotency_key",
-        ignoreDuplicates: true,
+      const { data, error } = await admin.rpc("admit_ai_run_server", {
+        target_tenant_id: value.tenantId,
+        target_property_id: value.propertyId,
+        target_requested_by_user_id: value.requesterUserId,
+        target_idempotency_key: value.idempotencyKey,
+        target_input_snapshot: value.snapshot,
+        target_input_property_version: snapshot.property.version,
+        target_tasks: tasks,
+        target_model_profile_key: tasks[0],
+        target_trace_id: traceId,
+        max_attempts: limits.maxAttempts,
+        max_concurrent_runs_per_tenant: limits.maxConcurrentRunsPerTenant,
+        max_runs_per_tenant_per_day: limits.maxRunsPerTenantPerDay,
       });
       if (error) throw error;
-      const { data, error: readError } = await admin
-        .from("ai_runs")
-        .select("id,trace_id")
-        .eq("tenant_id", String(value.tenantId))
-        .eq("idempotency_key", String(value.idempotencyKey))
-        .single();
-      if (readError) throw readError;
+      const result = Array.isArray(data) ? data[0] : data;
       return {
-        id: data.id,
-        traceId: data.trace_id,
-        created: data.trace_id === traceId,
+        id: result?.id ?? null,
+        traceId: result?.trace_id ?? null,
+        created: result?.status === "created",
+        status: result?.status,
+        queuedAtomically: true,
       };
     },
   };
@@ -84,6 +81,7 @@ export async function startAiIntakeAction(input: Record<string, unknown>) {
     createPostgresAiJobDispatcher(
       async (name, args) => await admin.rpc(name, args),
     ),
+    { maxTextCharacters: limits.maxTextCharacters, maxImages: limits.maxImages },
   );
   if (result.ok)
     revalidatePath(`/dashboard/properties/${String(input.propertyId)}/ai`);

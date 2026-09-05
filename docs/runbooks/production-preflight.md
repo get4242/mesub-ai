@@ -6,7 +6,7 @@ This runbook prepares the existing Phase 0–4 system for release. It does not a
 
 The existing Supabase project previously named `mesub-ai-dev` is the approved promoted Production candidate. Its immutable project ref is pinned in `supabase/project-role.json`. Do not create a replacement project merely because the old display name contains `dev`, and do not treat that historical label as an environment authority.
 
-All 27 migrations are already applied. Do not rerun fixture-producing Development regressions against this project. Use `pnpm db:audit:production`, which validates its SQL as read-only and binds queries to the promoted project marker. Confirm migration parity, zero queues, RLS, private Storage, and residual-data counts before release.
+Migrations 1–27 are already applied. Migration 28 (`20260905090000_ai_tenant_operational_caps.sql`) adds atomic AI-run admission and must remain unapplied until its separate Cloud-change gate is approved. Do not rerun fixture-producing Development regressions against this project. Use `pnpm db:audit:production`, which validates its SQL as read-only and binds queries to the promoted project marker. Confirm migration parity, zero queues, RLS, private Storage, and residual-data counts before release.
 
 Enter the promoted project's URL, publishable key, server secret key, and exact project ref directly into the Vercel Production environment. Never paste them into chat or tracked files. After a Vercel Production HTTPS URL exists, update Supabase Auth Site URL and exact redirect URLs in a separately approved cloud-configuration step.
 
@@ -39,7 +39,9 @@ Set these Production variables directly in Vercel:
 - LINE_DEVELOPMENT_LOGIN_CHANNEL_ID
 - LINE_DEVELOPMENT_MINI_APP_LIFF_ID
 
-Generate encryption and trigger secrets locally with a cryptographically secure generator and enter them directly in the provider console. Production model IDs and operational budget caps are release blockers until explicitly approved. Never configure a fake email or fake LINE driver.
+Generate encryption and trigger secrets locally with a cryptographically secure generator and enter them directly in the provider console. The initial Production pilot model profiles are extraction and LINE conversation on `gpt-5.6-luna`, with vision, content, and fallback on `gpt-5.6-terra`. Runtime safety limits are a 30-second timeout, three attempts, 12,000 text characters, ten images, 5,000 generated characters, one active run per tenant, and ten admitted runs per tenant per UTC calendar day. The UTC day begins at `00:00:00Z`; idempotent reuse does not consume another admission. Keep the operational OpenAI budget target at USD 50/month with alerts at 50%, 75%, and 90%; this is pilot guidance, not a Free Plan entitlement. Never configure a fake email or fake LINE driver.
+
+On Vercel Hobby, the worker endpoint remains protected and deployable but a useful sub-daily Cron cadence is unavailable. Do not add an unsupported schedule. Before release, approve either a Vercel plan that supports the required cadence or a separately reviewed external scheduler that sends only the bearer trigger secret over HTTPS. Do not expose the worker endpoint without authentication.
 
 ## LINE Production
 

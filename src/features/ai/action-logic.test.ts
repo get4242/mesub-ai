@@ -15,6 +15,22 @@ describe("AI action logic", () => {
     await expect(startAiIntake({ propertyId: "other", expectedVersion: 1, agentText: "x", mediaIds: [], tasks: ["extraction"], idempotencyKey: "key" }, context, repository, dispatcher)).resolves.toEqual({ ok: false, code: "NOT_FOUND" });
     expect(dispatcher.enqueue).not.toHaveBeenCalled();
   });
+  it("does not dispatch a second queue message when the admission RPC enqueued atomically", async () => {
+    const repository = { getProperty: vi.fn().mockResolvedValue({ id: "property-a", tenantId: "tenant-a", version: 2 }), getMedia: vi.fn().mockResolvedValue([]), getOrCreateRun: vi.fn().mockResolvedValue({ id: "run-a", traceId: "trace-a", created: true, status: "created", queuedAtomically: true }) };
+    const dispatcher = { enqueue: vi.fn() };
+    await expect(startAiIntake({ propertyId: "property-a", expectedVersion: 2, agentText: "details", mediaIds: [], tasks: ["extraction"], idempotencyKey: "key-a" }, context, repository, dispatcher)).resolves.toEqual({ ok: true, data: { runId: "run-a" } });
+    expect(dispatcher.enqueue).not.toHaveBeenCalled();
+  });
+  it.each(["concurrency_limited", "daily_limited"] as const)("maps %s admission denial without dispatch", async (status) => {
+    const dispatcher = { enqueue: vi.fn() };
+    const repository = {
+      getProperty: vi.fn().mockResolvedValue({ id: "property-a", tenantId: "tenant-a", version: 2 }),
+      getMedia: vi.fn().mockResolvedValue([]),
+      getOrCreateRun: vi.fn().mockResolvedValue({ id: null, traceId: null, created: false, status }),
+    };
+    await expect(startAiIntake({ propertyId: "property-a", expectedVersion: 2, agentText: "details", mediaIds: [], tasks: ["extraction"], idempotencyKey: "key-a" }, context, repository, dispatcher)).resolves.toEqual({ ok: false, code: "AI_LIMIT_REACHED" });
+    expect(dispatcher.enqueue).not.toHaveBeenCalled();
+  });
   it("maps stale and already decided suggestion results", async () => {
     await expect(decideSuggestion("accept", { suggestionId: "s", expectedPropertyVersion: 1 }, async () => { throw new Error("VERSION_CONFLICT"); })).resolves.toEqual({ ok: false, code: "VERSION_CONFLICT" });
   });

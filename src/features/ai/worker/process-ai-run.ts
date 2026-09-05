@@ -3,12 +3,12 @@ import type { AiProvider } from "../provider/provider";
 
 type ClaimedRun = { id: string; attempt: number; snapshot: unknown; task: "extraction" | "vision" | "content" | "fallback"; model: string; sourceIds: string[] };
 type Repository = { claim(id: string): Promise<ClaimedRun | null>; succeed(run: ClaimedRun, result: unknown, suggestions: unknown[]): Promise<void> | void; fail(run: ClaimedRun, error: { category: string; retryable: boolean; deadLetter: boolean }): Promise<void> | void };
-export async function processAiRun(runId: string, dependencies: { repository: Repository; provider: AiProvider; maxAttempts: number; timeoutMs?: number }) {
+export async function processAiRun(runId: string, dependencies: { repository: Repository; provider: AiProvider; maxAttempts: number; timeoutMs?: number; maxContentCharacters?: number }) {
   const run = await dependencies.repository.claim(runId);
   if (!run) return;
   try {
     const result = await dependencies.provider.generate({ model: run.model, task: run.task, snapshot: run.snapshot, timeoutMs: dependencies.timeoutMs ?? 30_000 });
-    const validated = validateAiOutput(result.output, new Set(run.sourceIds));
+    const validated = validateAiOutput(result.output, new Set(run.sourceIds), { maxContentCharacters: dependencies.maxContentCharacters ?? 5_000 });
     if (!validated.ok) { await dependencies.repository.fail(run, { category: validated.code, retryable: false, deadLetter: false }); return; }
     await dependencies.repository.succeed(run, result, validated.suggestions);
   } catch (error) {
