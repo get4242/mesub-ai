@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema, signupSchema, type AuthActionResult } from "./schemas";
 
@@ -23,10 +24,16 @@ export async function signupAction(formData: FormData): Promise<AuthActionResult
   if (!parsed.success) return { ok: false, code: "INVALID_INPUT", message: "กรุณาตรวจสอบข้อมูลสมัครสมาชิก" };
 
   const supabase = await createClient();
+  const requestHeaders = await headers();
+  const origin = requestHeaders.get("origin");
+  const emailRedirectTo = origin ? new URL("/auth/callback", origin).toString() : undefined;
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
-    options: { data: { display_name: parsed.data.displayName } }
+    options: {
+      data: { display_name: parsed.data.displayName },
+      emailRedirectTo
+    }
   });
   if (error) return { ok: false, code: "AUTH_UNAVAILABLE", message: "สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่" };
   return { ok: true };

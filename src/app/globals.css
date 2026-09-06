@@ -83,6 +83,23 @@ textarea:focus-visible {
 .auth-shell { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--canvas); }
 .auth-card { width: min(100%, 460px); display: grid; gap: 20px; }
 .auth-card > .brand { justify-self: center; }
+.auth-card .panel { display: grid; gap: 18px; }
+.auth-card .panel h1,
+.auth-card .panel p { margin: 0; }
+.auth-field { display: grid; gap: 7px; min-width: 0; }
+.auth-field label { display: block; font-weight: 800; line-height: 1.35; }
+.auth-field input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+}
+.auth-help { color: var(--muted); font-size: 14px; line-height: 1.45; }
 .public-nav {
   display: flex;
   gap: 28px;

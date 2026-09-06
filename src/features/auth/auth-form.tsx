@@ -34,15 +34,20 @@ export function AuthForm({ mode, action }: Props) {
       <form action={formAction} className="panel">
       <h1>{signup ? "สมัคร Agent" : "เข้าสู่ระบบ Agent"}</h1>
       {signup ? (
-        <>
+        <div className="auth-field">
           <label htmlFor="displayName">ชื่อที่ใช้แสดง</label>
           <input id="displayName" name="displayName" maxLength={120} required />
-        </>
+        </div>
       ) : null}
-      <label htmlFor="email">อีเมล</label>
-      <input id="email" name="email" type="email" autoComplete="email" required />
-      <label htmlFor="password">รหัสผ่าน</label>
-      <input id="password" name="password" type="password" autoComplete={signup ? "new-password" : "current-password"} minLength={12} required />
+      <div className="auth-field">
+        <label htmlFor="email">อีเมล</label>
+        <input id="email" name="email" type="email" autoComplete="email" required />
+      </div>
+      <div className="auth-field">
+        <label htmlFor="password">รหัสผ่าน</label>
+        <input id="password" name="password" type="password" autoComplete={signup ? "new-password" : "current-password"} minLength={6} required />
+        {signup ? <p className="auth-help">รหัสผ่านอย่างน้อย 6 ตัวอักษร</p> : null}
+      </div>
       {result && !result.ok ? <p role="alert">{result.message}</p> : null}
       {result?.ok && signup ? <p role="status">สมัครสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี</p> : null}
       <SubmitButton label={signup ? "สมัครสมาชิก" : "เข้าสู่ระบบ"} />
