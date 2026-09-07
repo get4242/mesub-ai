@@ -2,6 +2,8 @@ import { updateAgentProfileFormAction } from "@/features/agents/actions";
 import { getOwnAgentProfile } from "@/features/agents/queries";
 import { LineAccountCard } from "@/components/line-account-card";
 import { createClient } from "@/lib/supabase/server";
+import { changePasswordAction } from "@/features/auth/actions";
+import { PasswordForm } from "@/features/auth/password-form";
 export default async function ProfilePage() {
   const profile = await getOwnAgentProfile();
   const supabase = await createClient();
@@ -81,6 +83,15 @@ export default async function ProfilePage() {
             <button>บันทึกโปรไฟล์</button>
           </footer>
         </form>
+        <section className="form-section">
+          <header>
+            <div>
+              <h2>เปลี่ยนรหัสผ่าน</h2>
+              <span className="hint">หลังเปลี่ยนสำเร็จ ระบบจะให้เข้าสู่ระบบใหม่</span>
+            </div>
+          </header>
+          <PasswordForm mode="change" action={changePasswordAction} />
+        </section>
         <LineAccountCard liffId={liffId} linked={Boolean(link)} notificationsEnabled={notificationConsent?.enabled === true} />
       </main>
     </>

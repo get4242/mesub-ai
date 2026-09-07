@@ -48,6 +48,7 @@ export function AuthForm({ mode, action }: Props) {
         <input id="password" name="password" type="password" autoComplete={signup ? "new-password" : "current-password"} minLength={6} required />
         {signup ? <p className="auth-help">รหัสผ่านอย่างน้อย 6 ตัวอักษร</p> : null}
       </div>
+      {!signup ? <p><Link className="text-link" href="/forgot-password">ลืมรหัสผ่าน?</Link></p> : null}
       {result && !result.ok ? <p role="alert">{result.message}</p> : null}
       {result?.ok && signup ? <p role="status">สมัครสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี</p> : null}
       <SubmitButton label={signup ? "สมัครสมาชิก" : "เข้าสู่ระบบ"} />
