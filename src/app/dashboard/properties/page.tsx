@@ -1,6 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { listAgentProperties } from "@/features/properties/queries";
+import {
+  listAgentProperties,
+  listAgentReadyPropertyMedia,
+} from "@/features/properties/queries";
 import { publishPropertyFormAction } from "@/features/properties/publication-actions";
 import { createClient } from "@/lib/supabase/server";
 import { requireAgentContext } from "@/lib/auth/require-agent-context";
@@ -16,9 +19,8 @@ export default async function PropertiesPage() {
   const [
     { data: entitlement },
     { count },
-    { data: publicMedia },
     { data: publicProperties },
-    { data: confirmations },
+    readyMedia,
   ] =
     await Promise.all([
       client
@@ -31,32 +33,19 @@ export default async function PropertiesPage() {
         .select("id", { count: "exact", head: true })
         .eq("tenant_id", context.tenantId)
         .eq("status", "published"),
-      client
-        .from("public_property_media")
-        .select("property_id,media_id,position")
-        .order("position"),
       client.from("public_properties").select("id,slug"),
-      client
-        .from("property_confirmations")
-        .select("property_id,critical_version")
-        .eq("tenant_id", context.tenantId),
+      listAgentReadyPropertyMedia(properties.map((property) => property.id)),
     ]);
   const limit =
     (entitlement as { active_property_limit?: number } | null)
       ?.active_property_limit ?? 3;
   const quota = quotaCopy(count ?? 0, limit);
   const covers = new Map<string, string>();
-  for (const item of publicMedia ?? [])
+  for (const item of readyMedia)
     if (!covers.has(item.property_id))
-      covers.set(item.property_id, item.media_id);
+      covers.set(item.property_id, item.id);
   const slugs = new Map(
     (publicProperties ?? []).map((property) => [property.id, property.slug]),
-  );
-  const confirmedVersions = new Set(
-    (confirmations ?? []).map(
-      (confirmation) =>
-        `${confirmation.property_id}:${confirmation.critical_version}`,
-    ),
   );
   return (
     <>
@@ -78,7 +67,7 @@ export default async function PropertiesPage() {
         {!properties.length ? (
           <div className="empty-state">
             <h2>เพิ่มทรัพย์รายการแรก</h2>
-            <p>เริ่มสร้างร่างข้อมูลทรัพย์และเพิ่มรูปภาพได้ที่นี่</p>
+            <p>กรอกข้อมูล เพิ่มรูป แล้วกดเผยแพร่เมื่อพร้อมได้ที่นี่</p>
             <Link className="button" href="/dashboard/properties/new">
               เพิ่มทรัพย์
             </Link>
@@ -88,22 +77,21 @@ export default async function PropertiesPage() {
             {properties.map((property) => {
               const actions = propertyUiActions(
                 property.status,
-                confirmedVersions.has(
-                  `${property.id}:${property.critical_version}`,
-                ),
+                false,
               );
               return (
                 <article className="property-row" key={property.id}>
                   {covers.get(property.id) ? (
                     <Image
                       className="property-thumb"
-                      src={`/api/public-property-media/${covers.get(property.id)}`}
-                      alt=""
-                      width={180}
-                      height={120}
+                      src={`/api/agent-property-media/${covers.get(property.id)}`}
+                      alt={`รูปภาพ ${property.title}`}
+                      width={76}
+                      height={62}
+                      unoptimized
                     />
                   ) : (
-                    <div className="property-thumb" />
+                    <div className="property-thumb property-thumb-empty">ยังไม่มีรูป</div>
                   )}
                   <div>
                     <h3>{property.title}</h3>

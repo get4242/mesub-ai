@@ -3,7 +3,11 @@ import { propertyUiActions, quotaCopy, statusDescription } from "./ui-model";
 
 describe("property UI model", () => {
   it("shows only lifecycle-supported actions", () => {
-    expect(propertyUiActions("draft", false)).toEqual(["edit", "ai"]);
+    expect(propertyUiActions("draft", false)).toEqual([
+      "edit",
+      "ai",
+      "publish",
+    ]);
     expect(propertyUiActions("draft", true)).toEqual([
       "edit",
       "ai",
@@ -12,6 +16,7 @@ describe("property UI model", () => {
     expect(propertyUiActions("pending_confirmation", false)).toEqual([
       "edit",
       "ai",
+      "publish",
     ]);
     expect(propertyUiActions("published", true)).toEqual(["edit", "view"]);
     expect(propertyUiActions("archived", true)).toEqual([]);

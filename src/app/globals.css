@@ -589,6 +589,15 @@ button {
   object-fit: cover;
   background: linear-gradient(145deg, #d8ebe4, #7faa97);
 }
+.property-thumb-empty {
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  color: #426259;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
 .row-actions {
   display: flex;
   flex-wrap: wrap;

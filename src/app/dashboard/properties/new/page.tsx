@@ -18,7 +18,7 @@ export default function NewPropertyPage() {
     try {
       const result = await createPropertyDraftFormAction(data);
       if (!result.ok) { setMessage(result.message); return; }
-      setMessage("สร้างแบบร่างสำเร็จ กำลังเปิดทรัพย์…");
+      setMessage("บันทึกทรัพย์สำเร็จ กำลังเปิดรายการ…");
       router.push(`/dashboard/properties/${result.data.id}/edit?created=1`);
     } catch {
       setMessage("บันทึกไม่สำเร็จ กรุณาลองใหม่ ข้อมูลที่กรอกยังอยู่ครบ");
@@ -140,20 +140,20 @@ export default function NewPropertyPage() {
               <div>
                 <h2>รูปภาพทรัพย์</h2>
                 <span className="hint">
-                  หลังบันทึกร่าง คุณเพิ่มรูปได้สูงสุด 20 รูป
+                  หลังบันทึก คุณเพิ่มรูปได้สูงสุด 20 รูป
                   เลือกภาพปกและจัดลำดับได้
                 </span>
               </div>
             </header>
             <div className="empty-state">
-              บันทึกร่างก่อน แล้วระบบจะเปิดพื้นที่จัดการรูปภาพให้คุณ
+              บันทึกก่อน แล้วระบบจะเปิดพื้นที่จัดการรูปภาพให้คุณ
             </div>
           </section>
           <footer className="sticky-actions">
             <Link className="button-secondary" href="/dashboard/properties">
               ยกเลิก
             </Link>
-            <p role="status" aria-live="polite">{message}</p><button type="submit" disabled={pending}>{pending ? "กำลังบันทึก…" : "บันทึกเป็นแบบร่าง"}</button>
+            <p role="status" aria-live="polite">{message}</p><button type="submit" disabled={pending}>{pending ? "กำลังบันทึก…" : "บันทึกทรัพย์"}</button>
           </footer>
         </form>
       </main>

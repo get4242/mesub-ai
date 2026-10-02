@@ -5,7 +5,7 @@ export function propertyUiActions(
   hasCurrentConfirmation = false,
 ): PropertyUiAction[] {
   if (status === "draft" || status === "pending_confirmation")
-    return hasCurrentConfirmation ? ["edit", "ai", "publish"] : ["edit", "ai"];
+    return ["edit", "ai", "publish"];
   if (status === "published") return ["edit", "view"];
   if ((status === "sold" || status === "inactive") && hasCurrentConfirmation)
     return ["edit", "publish"];
@@ -21,8 +21,8 @@ export function quotaCopy(used: number, limit: number) {
 }
 
 export const statusCopy: Record<string, string> = {
-  draft: "แบบร่าง",
-  pending_confirmation: "รอยืนยัน",
+  draft: "ยังไม่เผยแพร่",
+  pending_confirmation: "พร้อมเผยแพร่",
   published: "เผยแพร่แล้ว",
   sold: "ขายแล้ว",
   inactive: "ไม่ใช้งาน",
@@ -30,8 +30,8 @@ export const statusCopy: Record<string, string> = {
 };
 
 export const statusDescription: Record<string, string> = {
-  draft: "ข้อมูลนี้ยังเป็นส่วนตัว แก้ไข เพิ่มรูป และให้ AI ช่วยได้ก่อนเผยแพร่",
-  pending_confirmation: "รอตรวจข้อมูลสำคัญและยืนยันก่อนเผยแพร่",
+  draft: "ข้อมูลนี้ยังเป็นส่วนตัว กดเผยแพร่เมื่อพร้อมให้ลูกค้าเห็น",
+  pending_confirmation: "กดเผยแพร่เพื่อให้ลูกค้าเห็นประกาศนี้บนเว็บไซต์",
   published: "ลูกค้าสามารถเห็นประกาศนี้บนเว็บไซต์แล้ว",
   sold: "เก็บสถานะไว้เพื่อบันทึกว่าทรัพย์ขายแล้ว",
   inactive: "หยุดแสดงประกาศชั่วคราว",
