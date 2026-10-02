@@ -1,12 +1,13 @@
 import { loginAction } from "@/features/auth/actions";
 import { AuthForm } from "@/features/auth/auth-form";
+import { safeAuthNext } from "@/features/auth/recovery-routing";
 
 type Props = {
-  searchParams: Promise<{ signup?: string }>;
+  searchParams: Promise<{ signup?: string; next?: string }>;
 };
 
 export default async function LoginPage({ searchParams }: Props) {
-  const { signup } = await searchParams;
+  const { signup, next } = await searchParams;
   const notice = signup === "confirmed"
     ? "ลงทะเบียนสำเร็จ คุณเข้าสู่ระบบได้ทันที"
     : signup === "check-email"
@@ -15,7 +16,7 @@ export default async function LoginPage({ searchParams }: Props) {
 
   return (
     <main className="auth-shell">
-      <AuthForm mode="login" action={loginAction} notice={notice} />
+      <AuthForm mode="login" action={loginAction} notice={notice} nextPath={safeAuthNext(next ?? null)} />
     </main>
   );
 }

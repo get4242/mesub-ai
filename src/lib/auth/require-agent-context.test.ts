@@ -14,10 +14,10 @@ describe("resolveAgentContext", () => {
     await expect(resolveAgentContext(source({ getAuthenticatedUser: async () => null }))).rejects.toMatchObject({ code: "UNAUTHENTICATED" });
   });
 
-  it("rejects an email-unverified user", async () => {
+  it("accepts an authenticated user when email confirmation is disabled", async () => {
     await expect(
       resolveAgentContext(source({ getAuthenticatedUser: async () => ({ id: "user-a", emailConfirmedAt: null }) }))
-    ).rejects.toMatchObject({ code: "EMAIL_UNVERIFIED" });
+    ).resolves.toMatchObject({ userId: "user-a", tenantId: "tenant-a" });
   });
 
   it("rejects a user without one active owner membership and agent profile", async () => {

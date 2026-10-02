@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { propertyUiActions, quotaCopy } from "./ui-model";
+import { propertyUiActions, quotaCopy, statusDescription } from "./ui-model";
 
 describe("property UI model", () => {
   it("shows only lifecycle-supported actions", () => {
@@ -22,5 +22,9 @@ describe("property UI model", () => {
       label: "เผยแพร่แล้ว 2 จาก 3",
       remaining: "เหลืออีก 1 รายการ",
     });
+  });
+
+  it("explains that archived properties are retained rather than deleted", () => {
+    expect(statusDescription.archived).toContain("ไม่ลบรูปหรือข้อมูล");
   });
 });

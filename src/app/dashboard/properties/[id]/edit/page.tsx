@@ -4,6 +4,7 @@ import {
   listPropertyMedia,
 } from "@/features/properties/queries";
 import { PropertyEditor } from "@/features/properties/property-editor";
+import { statusCopy, statusDescription } from "@/features/properties/ui-model";
 
 export default async function EditPropertyPage({
   params,
@@ -25,7 +26,7 @@ export default async function EditPropertyPage({
         <div className="page-head">
           <h1>{property.title}</h1>
           <p>
-            สถานะ: {property.status} · เวอร์ชัน {property.version}
+            สถานะ: {statusCopy[property.status] ?? property.status} · {statusDescription[property.status] ?? ""}
           </p>
         </div>
         <PropertyEditor property={property} initialMedia={media} />

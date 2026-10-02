@@ -282,9 +282,10 @@ export function PropertyEditor({
           </button>
         ) : null}
         <button disabled={pending} onClick={() => transition("archived")}>
-          เก็บเข้าคลัง
+          เก็บเข้าคลัง (ซ่อนทรัพย์)
         </button>
       </div>
+      <p className="hint">แบบร่างยังไม่แสดงต่อสาธารณะ ส่วน “เก็บเข้าคลัง” คือซ่อนทรัพย์ไว้โดยไม่ลบข้อมูลหรือรูปภาพ</p>
       {message ? <p role="status">{message}</p> : null}
       <section className="form-section" id="media">
         <header>
@@ -315,9 +316,12 @@ export function PropertyEditor({
               className={`media-card ${index === 0 ? "cover" : ""}`}
               key={row.id}
             >
-              <div className="media-placeholder">
-                {index === 0 ? "ภาพปก" : "รูปทรัพย์"}
-              </div>
+              {/* Authenticated media cannot use the public image optimizer because it must keep the Agent session. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/api/agent-property-media/${row.id}`}
+                alt={index === 0 ? `ภาพปก ${row.original_filename}` : row.original_filename}
+              />
               <div className="media-meta">
                 <b>{row.original_filename}</b>
                 <span className="muted">{row.status}</span>

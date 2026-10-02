@@ -28,3 +28,12 @@ export const statusCopy: Record<string, string> = {
   inactive: "ไม่ใช้งาน",
   archived: "เก็บเข้าคลัง",
 };
+
+export const statusDescription: Record<string, string> = {
+  draft: "ข้อมูลนี้ยังเป็นส่วนตัว แก้ไข เพิ่มรูป และให้ AI ช่วยได้ก่อนเผยแพร่",
+  pending_confirmation: "รอตรวจข้อมูลสำคัญและยืนยันก่อนเผยแพร่",
+  published: "ลูกค้าสามารถเห็นประกาศนี้บนเว็บไซต์แล้ว",
+  sold: "เก็บสถานะไว้เพื่อบันทึกว่าทรัพย์ขายแล้ว",
+  inactive: "หยุดแสดงประกาศชั่วคราว",
+  archived: "ซ่อนทรัพย์จากรายการทำงานและเว็บไซต์ โดยเก็บข้อมูลไว้ ไม่ลบรูปหรือข้อมูล",
+};

@@ -25,8 +25,6 @@ export class AgentContextError extends Error {
 export async function resolveAgentContext(source: AgentContextDataSource): Promise<AgentContext> {
   const user = await source.getAuthenticatedUser();
   if (!user) throw new AgentContextError("UNAUTHENTICATED");
-  if (!user.emailConfirmedAt) throw new AgentContextError("EMAIL_UNVERIFIED");
-
   const ownership = await source.getActiveOwnerContext(user.id);
   if (!ownership) throw new AgentContextError("AGENT_CONTEXT_UNAVAILABLE");
   return { userId: user.id, ...ownership };

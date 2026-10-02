@@ -11,6 +11,7 @@ type Props = {
   mode: "login" | "signup";
   action(formData: FormData): Promise<AuthActionResult>;
   notice?: string;
+  nextPath?: string;
 };
 
 function SubmitButton({ label }: { label: string }) {
@@ -18,7 +19,7 @@ function SubmitButton({ label }: { label: string }) {
   return <button type="submit" disabled={pending}>{pending ? "กำลังดำเนินการ…" : label}</button>;
 }
 
-export function AuthForm({ mode, action, notice }: Props) {
+export function AuthForm({ mode, action, notice, nextPath = "/dashboard" }: Props) {
   const router = useRouter();
   const [result, formAction] = useActionState<AuthActionResult | null, FormData>(
     async (_previous, formData) => action(formData),
@@ -27,9 +28,9 @@ export function AuthForm({ mode, action, notice }: Props) {
   const signup = mode === "signup";
   useEffect(() => {
     if (!result?.ok || signup) return;
-    const redirect = window.setTimeout(() => router.replace("/dashboard"), 750);
+    const redirect = window.setTimeout(() => router.replace(nextPath), 750);
     return () => window.clearTimeout(redirect);
-  }, [result, router, signup]);
+  }, [nextPath, result, router, signup]);
 
   return (
     <div className="auth-card">

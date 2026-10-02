@@ -20,10 +20,6 @@ export async function loginAction(formData: FormData): Promise<AuthActionResult>
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error || !data.user) return { ok: false, code: "INVALID_CREDENTIALS", message: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" };
-  if (!data.user.email_confirmed_at) {
-    await supabase.auth.signOut();
-    return { ok: false, code: "EMAIL_UNVERIFIED", message: "กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ" };
-  }
   return { ok: true, message: "เข้าสู่ระบบสำเร็จ กำลังเปิด Dashboard…" };
 }
 

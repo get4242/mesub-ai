@@ -19,6 +19,16 @@ export async function updateSession(request: NextRequest) {
     }
   });
 
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+  if (request.nextUrl.pathname.startsWith("/dashboard") && !data?.claims?.sub) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.search = "";
+    loginUrl.searchParams.set(
+      "next",
+      `${request.nextUrl.pathname}${request.nextUrl.search}`,
+    );
+    return NextResponse.redirect(loginUrl);
+  }
   return response;
 }
