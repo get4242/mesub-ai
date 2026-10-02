@@ -29,7 +29,7 @@ export const changePasswordSchema = passwordPair.extend({
 });
 
 export type AuthActionResult =
-  | { ok: true }
+  | { ok: true; message: string }
   | {
       ok: false;
       code: "INVALID_INPUT" | "INVALID_CREDENTIALS" | "EMAIL_UNVERIFIED" | "AUTH_UNAVAILABLE" | "PASSWORD_UPDATE_FAILED";

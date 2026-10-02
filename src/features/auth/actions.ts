@@ -24,7 +24,7 @@ export async function loginAction(formData: FormData): Promise<AuthActionResult>
     await supabase.auth.signOut();
     return { ok: false, code: "EMAIL_UNVERIFIED", message: "กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ" };
   }
-  return { ok: true };
+  return { ok: true, message: "เข้าสู่ระบบสำเร็จ กำลังเปิด Dashboard…" };
 }
 
 export async function signupAction(formData: FormData): Promise<AuthActionResult> {
@@ -35,7 +35,7 @@ export async function signupAction(formData: FormData): Promise<AuthActionResult
   const requestHeaders = await headers();
   const origin = requestHeaders.get("origin");
   const emailRedirectTo = origin ? new URL("/auth/callback", origin).toString() : undefined;
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
@@ -43,8 +43,13 @@ export async function signupAction(formData: FormData): Promise<AuthActionResult
       emailRedirectTo
     }
   });
-  if (error) return { ok: false, code: "AUTH_UNAVAILABLE", message: "สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่" };
-  return { ok: true };
+  if (error || !data.user) return { ok: false, code: "AUTH_UNAVAILABLE", message: "สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่" };
+  return {
+    ok: true,
+    message: data.user.email_confirmed_at
+      ? "สมัครสมาชิกและยืนยันบัญชีสำเร็จ คุณเข้าสู่ระบบได้ทันที"
+      : "สมัครสมาชิกสำเร็จ กรุณาตรวจสอบอีเมลและกดยืนยันบัญชีก่อนเข้าสู่ระบบ"
+  };
 }
 
 export async function forgotPasswordAction(formData: FormData): Promise<AuthActionResult> {
@@ -58,7 +63,7 @@ export async function forgotPasswordAction(formData: FormData): Promise<AuthActi
     redirectTo: passwordRecoveryRedirectUrl(origin)
   });
   if (error) return { ok: false, code: "AUTH_UNAVAILABLE", message: "ยังไม่สามารถส่งอีเมลได้ กรุณาลองใหม่ภายหลัง" };
-  return { ok: true };
+  return { ok: true, message: "หากมีบัญชีนี้ในระบบ เราได้ส่งลิงก์ตั้งรหัสผ่านใหม่ไปยังอีเมลแล้ว" };
 }
 
 export async function resetPasswordAction(formData: FormData): Promise<AuthActionResult> {
@@ -71,7 +76,7 @@ export async function resetPasswordAction(formData: FormData): Promise<AuthActio
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) return { ok: false, code: "PASSWORD_UPDATE_FAILED", message: "เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาขอลิงก์ใหม่" };
   await supabase.auth.signOut();
-  return { ok: true };
+  return { ok: true, message: "เปลี่ยนรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบอีกครั้ง" };
 }
 
 export async function changePasswordAction(formData: FormData): Promise<AuthActionResult> {
@@ -87,7 +92,7 @@ export async function changePasswordAction(formData: FormData): Promise<AuthActi
   });
   if (error) return { ok: false, code: "PASSWORD_UPDATE_FAILED", message: "รหัสผ่านปัจจุบันไม่ถูกต้อง หรือไม่สามารถเปลี่ยนรหัสได้" };
   await supabase.auth.signOut();
-  return { ok: true };
+  return { ok: true, message: "เปลี่ยนรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบอีกครั้ง" };
 }
 
 export async function logoutAction(): Promise<never> {

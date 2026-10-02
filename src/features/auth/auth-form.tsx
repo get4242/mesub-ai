@@ -25,7 +25,9 @@ export function AuthForm({ mode, action }: Props) {
   );
   const signup = mode === "signup";
   useEffect(() => {
-    if (result?.ok && !signup) router.replace("/dashboard");
+    if (!result?.ok || signup) return;
+    const redirect = window.setTimeout(() => router.replace("/dashboard"), 750);
+    return () => window.clearTimeout(redirect);
   }, [result, router, signup]);
 
   return (
@@ -50,7 +52,7 @@ export function AuthForm({ mode, action }: Props) {
       </div>
       {!signup ? <p><Link className="text-link" href="/forgot-password">ลืมรหัสผ่าน?</Link></p> : null}
       {result && !result.ok ? <p role="alert">{result.message}</p> : null}
-      {result?.ok && signup ? <p role="status">สมัครสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี</p> : null}
+      {result?.ok ? <p role="status" aria-live="polite">{result.message}</p> : null}
       <SubmitButton label={signup ? "สมัครสมาชิก" : "เข้าสู่ระบบ"} />
       <p>{signup ? "มีบัญชีแล้ว?" : "ยังไม่มีบัญชี?"} <Link href={signup ? "/login" : "/signup"}>{signup ? "เข้าสู่ระบบ" : "สมัครสมาชิก"}</Link></p>
       </form>
