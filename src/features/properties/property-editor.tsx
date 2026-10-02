@@ -10,11 +10,9 @@ import {
 import { propertyMutationMessage } from "./dashboard-model";
 import {
   archivePropertyMediaAction,
-  finalizePropertyMediaAction,
   reorderPropertyMediaAction,
-  requestPropertyMediaUploadAction,
 } from "@/features/media/actions";
-import { createClient } from "@/lib/supabase/client";
+import { resizeImageForUpload } from "@/features/media/browser-image";
 import Link from "next/link";
 
 type Property = {
@@ -89,44 +87,26 @@ export function PropertyEditor({
 
   async function uploadOne(file: File) {
     try {
-      const bytes = new Uint8Array(await file.arrayBuffer());
-      const bitmap = await createImageBitmap(file);
-      const checksum = Array.from(
-        new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)),
-      )
-        .map((value) => value.toString(16).padStart(2, "0"))
-        .join("");
-      const request = await requestPropertyMediaUploadAction({
-        propertyId: property.id,
-        originalFilename: file.name,
-        mimeType: file.type,
-        byteSize: file.size,
-        width: bitmap.width,
-        height: bitmap.height,
-        checksumSha256: checksum,
-        signature: Array.from(bytes.slice(0, 16)),
+      setMessage(`กำลังปรับขนาด ${file.name}…`);
+      const resized = await resizeImageForUpload(file);
+      const formData = new FormData();
+      formData.set("propertyId", property.id);
+      formData.set("file", resized);
+      const response = await fetch("/api/agent-property-media/upload", {
+        method: "POST",
+        body: formData,
       });
-      bitmap.close();
-      if (!request.ok) throw new Error(request.message);
-      const supabase = createClient();
-      const uploaded = await supabase.storage
-        .from(request.data.bucketId)
-        .upload(
-          request.data.objectPath,
-          file,
-          { contentType: file.type, upsert: false },
-        );
-      if (uploaded.error) throw uploaded.error;
-      const finalized = await finalizePropertyMediaAction(request.data.mediaId);
-      if (!finalized.ok) throw new Error("อัปโหลดไม่สมบูรณ์");
+      const result = await response.json() as {
+        ok: boolean;
+        message?: string;
+        media?: Media;
+      };
+      if (!response.ok || !result.ok || !result.media) {
+        throw new Error(result.message ?? "อัปโหลดไม่สำเร็จ");
+      }
       setMedia((rows) => [
         ...rows,
-        {
-          id: request.data.mediaId,
-          original_filename: file.name,
-          position: rows.length,
-          status: "ready",
-        },
+        result.media!,
       ]);
       return true;
     } catch (error) {
@@ -295,7 +275,7 @@ export function PropertyEditor({
           </div>
         </header>
         <label className="field" htmlFor="mediaFile">
-          <span>เพิ่มรูป JPEG, PNG หรือ WebP</span>
+          <span>เพิ่มรูปได้หลายรูป (JPEG, PNG หรือ WebP) — ระบบย่อรูปให้อัตโนมัติก่อนอัปโหลด</span>
           <input
             id="mediaFile"
             type="file"
