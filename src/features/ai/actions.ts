@@ -5,7 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createPostgresAiJobDispatcher } from "@/lib/queue/postgres-ai-job-dispatcher";
 import { startAiIntake, decideSuggestion } from "./action-logic";
+import { parseRuntimeEnvironment } from "@/config/runtime-environment";
 import { parseAiRuntimeLimits } from "@/config/ai-runtime";
+import { runWorkerCycle, type WorkerAdmin } from "@/features/workers/runtime";
 
 export async function startAiIntakeAction(input: Record<string, unknown>) {
   const context = await requireAgentContext();
@@ -83,8 +85,18 @@ export async function startAiIntakeAction(input: Record<string, unknown>) {
     ),
     { maxTextCharacters: limits.maxTextCharacters, maxImages: limits.maxImages },
   );
-  if (result.ok)
+  if (result.ok) {
+    try {
+      await runWorkerCycle(
+        admin as unknown as WorkerAdmin,
+        parseRuntimeEnvironment(process.env),
+        1,
+      );
+    } catch {
+      // The durable job remains queued for the protected worker trigger.
+    }
     revalidatePath(`/dashboard/properties/${String(input.propertyId)}/ai`);
+  }
   return result;
 }
 export async function acceptAiSuggestionAction(input: {

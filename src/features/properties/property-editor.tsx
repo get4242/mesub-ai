@@ -87,9 +87,7 @@ export function PropertyEditor({
     );
   }
 
-  async function upload(file: File) {
-    setPending(true);
-    setMessage(`กำลังอัปโหลด ${file.name}…`);
+  async function uploadOne(file: File) {
     try {
       const bytes = new Uint8Array(await file.arrayBuffer());
       const bitmap = await createImageBitmap(file);
@@ -131,13 +129,33 @@ export function PropertyEditor({
           status: "ready",
         },
       ]);
-      setMessage(`อัปโหลด ${file.name} สำเร็จ`);
+      return true;
     } catch (error) {
-      setMessage(
-        `${file.name}: ${error instanceof Error ? error.message : "อัปโหลดไม่สำเร็จ"}`,
-      );
-    } finally {
-      setPending(false);
+      return error instanceof Error ? error.message : "อัปโหลดไม่สำเร็จ";
+    }
+  }
+
+  async function upload(files: File[]) {
+    const allowed = Math.max(0, 20 - media.length);
+    const selected = files.slice(0, allowed);
+    if (!selected.length) {
+      setMessage("ทรัพย์นี้มีรูปครบ 20 รูปแล้ว");
+      return;
+    }
+    setPending(true);
+    const failures: string[] = [];
+    let completed = 0;
+    for (const [index, file] of selected.entries()) {
+      setMessage(`กำลังอัปโหลด ${index + 1}/${selected.length}: ${file.name}…`);
+      const result = await uploadOne(file);
+      if (result === true) completed += 1;
+      else failures.push(`${file.name}: ${result}`);
+    }
+    setPending(false);
+    if (failures.length) {
+      setMessage(`อัปโหลดสำเร็จ ${completed}/${selected.length} รูป — ${failures.join(" | ")}`);
+    } else {
+      setMessage(`อัปโหลดรูปสำเร็จ ${completed} รูป`);
     }
   }
 
@@ -282,10 +300,12 @@ export function PropertyEditor({
             id="mediaFile"
             type="file"
             accept="image/jpeg,image/png,image/webp"
+            multiple
             disabled={pending || media.length >= 20}
             onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (file) void upload(file);
+              const files = Array.from(event.target.files ?? []);
+              event.currentTarget.value = "";
+              if (files.length) void upload(files);
             }}
           />
         </label>

@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { intakeSubmitState } from "./ui-state";
+import { useRouter } from "next/navigation";
+import { aiSubmitMessage, intakeSubmitState } from "./ui-state";
 
 type IntakeSubmit = (
   input: Record<string, unknown>,
-) => Promise<{ ok: boolean }>;
+) => Promise<{ ok: boolean; code?: string }>;
 
 export function AiIntakePanel({
   media,
@@ -17,6 +18,8 @@ export function AiIntakePanel({
   const [text, setText] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const router = useRouter();
   const state = useMemo(
     () => intakeSubmitState(text, selected.length),
     [text, selected],
@@ -56,23 +59,27 @@ export function AiIntakePanel({
       </div>
       <p className="hint">{state.message}</p>
       <button
-        disabled={state.disabled}
+        disabled={state.disabled || submitting}
         onClick={async () => {
+          setSubmitting(true);
           setMessage("กำลังส่งข้อมูลให้ AI…");
-          const result = await submit({
-            agentText: text,
-            mediaIds: selected,
-            tasks: ["extraction"],
-            idempotencyKey: crypto.randomUUID(),
-          });
-          setMessage(
-            result.ok
-              ? "รับข้อมูลแล้ว กำลังช่วยจัดข้อมูล"
-              : "ส่งข้อมูลไม่สำเร็จ",
-          );
+          try {
+            const result = await submit({
+              agentText: text,
+              mediaIds: selected,
+              tasks: ["extraction"],
+              idempotencyKey: crypto.randomUUID(),
+            });
+            setMessage(aiSubmitMessage(result));
+            if (result.ok) router.refresh();
+          } catch {
+            setMessage("ส่งข้อมูลให้ AI ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+          } finally {
+            setSubmitting(false);
+          }
         }}
       >
-        ✦ ให้ AI ช่วยจัดข้อมูล
+        {submitting ? "กำลังให้ AI ช่วย…" : "✦ ให้ AI ช่วยจัดข้อมูล"}
       </button>
       <p className="status-message" role="status" aria-live="polite">
         {message}
