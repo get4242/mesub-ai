@@ -6,6 +6,8 @@ const eventSchema = z
     webhookEventId: z.string().min(1).max(200),
     type: z.string().min(1).max(60),
     timestamp: z.number().int().nonnegative(),
+    source: z.object({ type: z.string(), userId: z.string().max(200).optional() }).optional(),
+    postback: z.object({ data: z.string().max(300), params: z.record(z.string(), z.string()).optional() }).optional(),
     deliveryContext: z.object({ isRedelivery: z.boolean() }).optional(),
     message: z
       .object({
@@ -38,9 +40,11 @@ export function verifyLineWebhookSignature(
   );
 }
 
-export function normalizeLineWebhook(rawBody: string) {
+export function normalizeLineWebhook(rawBody: string, protectIdentity?: (subject: string) => { subjectHash: string; destination: string }) {
   const parsed = envelopeSchema.parse(JSON.parse(rawBody));
   return parsed.events.map((event) => ({
+    ...(event.source?.type === "user" && event.source.userId && protectIdentity ? protectIdentity(event.source.userId) : {}),
+    ...(event.postback ? { postback: event.postback.data, postbackParams: event.postback.params } : {}),
     eventId: event.webhookEventId,
     type: event.type,
     timestamp: event.timestamp,

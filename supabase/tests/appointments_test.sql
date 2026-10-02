@@ -1,0 +1,16 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+select plan(9);
+select ok((select relrowsecurity from pg_class where oid='public.appointments'::regclass),'appointments enforce RLS');
+select ok(not has_table_privilege('authenticated','public.appointments','insert'),'creation must use validated domain action');
+select ok(not has_table_privilege('authenticated','public.appointments','update'),'changes must use version and ownership checks');
+select ok(not has_table_privilege('anon','public.appointments','select'),'customer contact details are private');
+select ok(not has_function_privilege('authenticated','public.line_appointment_confirm_server(text,text,text,uuid)','execute'),'clients cannot forge LINE confirmation identity');
+select ok(not has_function_privilege('anon','public.enqueue_due_appointment_reminders_server(text)','execute'),'only worker queues reminders');
+set local "request.jwt.claims"='{"role":"authenticated"}';
+select throws_ok($$select public.line_appointment_confirm_server('test','development',repeat('a',64),gen_random_uuid())$$,'42501','FORBIDDEN','LINE bridge verifies service JWT');
+select throws_ok($$select public.create_appointment(gen_random_uuid(),'{}','test-request')$$,'42501','APPOINTMENT_FORBIDDEN','unknown owner cannot create appointment');
+set local "request.jwt.claims"='{"role":"service_role"}';
+select throws_ok($$select public.line_appointment_change_server('test','development',repeat('a',64),gen_random_uuid(),'cancel')$$,'42501','APPOINTMENT_FORBIDDEN','unknown appointment cannot be mutated');
+select * from finish();
+rollback;

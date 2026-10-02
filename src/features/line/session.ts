@@ -11,6 +11,7 @@ const SAFE_RETURN_PATHS = [
   /^\/dashboard$/,
   /^\/dashboard\/properties(?:\/new|\/[0-9a-f-]+(?:\/ai)?)?$/,
   /^\/dashboard\/leads$/,
+  /^\/dashboard\/appointments$/,
   /^\/dashboard\/profile$/,
 ];
 

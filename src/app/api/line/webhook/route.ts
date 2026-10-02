@@ -1,6 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { handleLineWebhook } from "@/features/line/webhook-handler";
 import { getLineServerConfig } from "@/features/line/server-config";
+import { createSubjectHash } from "@/features/line/session";
+import { encryptLineDestination } from "@/features/line/destination-crypto";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +33,7 @@ export async function POST(request: Request) {
         return Boolean(data);
       },
     },
+    (subject) => ({ subjectHash: createSubjectHash(subject, config.hashKey), destination: encryptLineDestination(subject, config.encryptionKey) }),
   );
   return Response.json(
     { accepted: result.status === 200 },

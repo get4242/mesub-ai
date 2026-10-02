@@ -1,5 +1,6 @@
 "use server";
 
+import { propertyFormInput } from "./form-input";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAgentContext } from "@/lib/auth/require-agent-context";
@@ -52,18 +53,10 @@ export async function requestPropertyConfirmationAction(propertyId: string, expe
 export async function returnPropertyToDraftAction(propertyId: string, expectedVersion: number) { return transition(propertyId, expectedVersion, "draft"); }
 export async function archivePropertyAction(propertyId: string, expectedVersion: number) { return transition(propertyId, expectedVersion, "archived"); }
 
-function optionalNumber(value: FormDataEntryValue | null) {
-  return value === null || value === "" ? undefined : Number(value);
-}
-
-export async function createPropertyDraftFormAction(formData: FormData): Promise<void> {
-  await createPropertyDraftAction({
-    listingType: formData.get("listingType"), propertyType: formData.get("propertyType"),
-    title: formData.get("title"), description: formData.get("description"), province: formData.get("province"),
-    district: formData.get("district"), subdistrict: formData.get("subdistrict") || undefined,
-    price: formData.get("price"), currency: "THB",
-    landAreaSquareMetres: formData.get("landAreaSquareMetres") || undefined,
-    buildingAreaSquareMetres: formData.get("buildingAreaSquareMetres") || undefined,
-    bedrooms: optionalNumber(formData.get("bedrooms")), bathrooms: optionalNumber(formData.get("bathrooms"))
-  });
+export async function createPropertyDraftFormAction(formData: FormData): Promise<PropertyMutationResult<PropertyRecordVersion>> {
+  try {
+    return await createPropertyDraftAction(propertyFormInput(formData));
+  } catch {
+    return { ok: false, code: "INVALID_INPUT", message: "บันทึกไม่สำเร็จ กรุณาตรวจสอบข้อมูลพื้นที่และลองใหม่" };
+  }
 }

@@ -1,6 +1,29 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createPropertyDraftFormAction } from "@/features/properties/actions";
+import { LandAreaFields } from "@/features/properties/land-area-fields";
 export default function NewPropertyPage() {
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
+  const [message, setMessage] = useState("");
+  async function save(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (pending) return;
+    const data = new FormData(event.currentTarget);
+    setPending(true);
+    setMessage("");
+    try {
+      const result = await createPropertyDraftFormAction(data);
+      if (!result.ok) { setMessage(result.message); return; }
+      setMessage("สร้างแบบร่างสำเร็จ กำลังเปิดทรัพย์…");
+      router.push(`/dashboard/properties/${result.data.id}/edit?created=1`);
+    } catch {
+      setMessage("บันทึกไม่สำเร็จ กรุณาลองใหม่ ข้อมูลที่กรอกยังอยู่ครบ");
+    } finally { setPending(false); }
+  }
   return (
     <>
       <header className="agent-topbar">
@@ -14,7 +37,7 @@ export default function NewPropertyPage() {
           <h1>เริ่มสร้างประกาศใหม่</h1>
           <p>กรอกเท่าที่คุณมี แล้วให้ AI ช่วยจัดข้อมูลต่อได้</p>
         </div>
-        <form action={createPropertyDraftFormAction} className="property-form">
+        <form onSubmit={save} className="property-form">
           <section className="form-section">
             <header>
               <i className="step-number">1</i>
@@ -77,10 +100,7 @@ export default function NewPropertyPage() {
                 <span>ตำบล / แขวง</span>
                 <input name="subdistrict" />
               </label>
-              <label className="field">
-                <span>พื้นที่ดิน (ตร.ม.)</span>
-                <input name="landAreaSquareMetres" inputMode="decimal" />
-              </label>
+              <LandAreaFields />
               <label className="field">
                 <span>พื้นที่ใช้สอย (ตร.ม.)</span>
                 <input name="buildingAreaSquareMetres" inputMode="decimal" />
@@ -133,7 +153,7 @@ export default function NewPropertyPage() {
             <Link className="button-secondary" href="/dashboard/properties">
               ยกเลิก
             </Link>
-            <button type="submit">บันทึกเป็นแบบร่าง</button>
+            <p role="status" aria-live="polite">{message}</p><button type="submit" disabled={pending}>{pending ? "กำลังบันทึก…" : "บันทึกเป็นแบบร่าง"}</button>
           </footer>
         </form>
       </main>

@@ -1,0 +1,17 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+select plan(10);
+select ok((select relrowsecurity from pg_class where oid='public.line_conversations'::regclass),'conversation state has RLS');
+select ok(not has_table_privilege('authenticated','public.line_conversations','select'),'agents cannot read other conversation identities');
+select ok(not has_function_privilege('authenticated','public.line_context_server(text,text,text)','execute'),'identity bridge is server-only');
+select ok(not has_function_privilege('anon','public.line_public_properties_server(jsonb,uuid)','execute'),'search bridge is server-only');
+select ok(has_function_privilege('service_role','public.line_public_properties_server(jsonb,uuid)','execute'),'worker can query published properties');
+set local "request.jwt.claims"='{"role":"service_role"}';
+select is(public.line_context_server('test','development',repeat('a',64))->'actor','null'::jsonb,'unknown identity has no agent privileges');
+select public.line_remember_properties_server('test','development',repeat('a',64),array['00000000-0000-4000-8000-000000000001'::uuid]);
+select is(jsonb_array_length(public.line_context_server('test','development',repeat('a',64))->'propertyIds'),1,'context is remembered for the same identity');
+select is(jsonb_array_length(public.line_context_server('test','development',repeat('b',64))->'propertyIds'),0,'another identity cannot inherit selected property');
+select is(jsonb_array_length(public.line_context_server('test','production',repeat('a',64))->'propertyIds'),0,'context is isolated across environments');
+select is(jsonb_array_length(public.line_public_properties_server('{}','00000000-0000-4000-8000-000000000001')),0,'unknown or unpublished property is not fabricated');
+select * from finish();
+rollback;

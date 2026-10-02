@@ -3,6 +3,7 @@ import { z } from "zod";
 import { processAiRun } from "../ai/worker/process-ai-run";
 import { createOpenAiGateway } from "../ai/provider/openai-gateway";
 import { processLineNotification } from "../line/process-notification";
+import { processLineConversation } from "../line/conversation";
 import { decryptLineDestination } from "../line/destination-crypto";
 import { createLineDriver } from "./runtime-drivers";
 import type { parseRuntimeEnvironment } from "../../config/runtime-environment";
@@ -36,7 +37,7 @@ export async function runWorkerCycle(
   admin: WorkerAdmin,
   environment: RuntimeEnvironment,
   batchSize = 5,
-  dependencies: { provider?: AiProvider } = {},
+  dependencies: { provider?: AiProvider; conversation?: typeof processLineConversation } = {},
 ) {
   const boundedBatch = Math.max(1, Math.min(batchSize, 10));
   const summary = { ai: 0, lineWebhooks: 0, lineNotifications: 0, platformIntake: 0 };
@@ -93,7 +94,7 @@ export async function runWorkerCycle(
     summary.ai += 1;
   }
 
-  const lineRows = z.array(queueRowSchema).parse(await rpc(admin, "read_line_jobs_server", { visibility_timeout_seconds: 60, batch_size: boundedBatch }));
+  const lineRows = z.array(queueRowSchema).parse(await rpc(admin, "read_line_jobs_server", { visibility_timeout_seconds: 180, batch_size: boundedBatch }));
   for (const row of lineRows) {
     const message = lineMessageSchema.safeParse(row.message);
     if (!message.success) {
@@ -101,11 +102,24 @@ export async function runWorkerCycle(
       continue;
     }
     const claimed = firstRow(await rpc(admin, "claim_line_webhook_server", { target_event_id: message.data.eventId }));
-    if (claimed) await rpc(admin, "complete_line_webhook_server", { target_event_id: message.data.eventId, target_ignored: claimed.event_type !== "message" });
-    await rpc(admin, "archive_line_job_server", { message_id: row.message_id });
+    let terminal = false;
+    if (claimed) {
+      try {
+        const handled = await (dependencies.conversation ?? processLineConversation)(claimed.payload,admin,environment);
+        await rpc(admin, "complete_line_webhook_server", { target_event_id: message.data.eventId, target_ignored: !handled });
+        terminal = true;
+      } catch {
+        const state = await rpc(admin, "fail_line_webhook_server", { target_event_id: message.data.eventId, target_dead_letter: row.read_count >= environment.ai.limits.maxAttempts });
+        terminal = state === "dead_letter";
+      }
+    } else {
+      terminal = Boolean(await rpc(admin, "line_event_terminal_server", { target_event_id: message.data.eventId }));
+    }
+    if (terminal) await rpc(admin, "archive_line_job_server", { message_id: row.message_id });
     summary.lineWebhooks += 1;
   }
 
+  await rpc(admin, "enqueue_due_appointment_reminders_server", { target_environment: environment.line.environment });
   const notificationRows = z.array(queueRowSchema).parse(await rpc(admin, "read_line_notification_jobs_server", { visibility_timeout_seconds: 60, batch_size: boundedBatch }));
   const lineDriver = createLineDriver({ environment: environment.line.environment, accessToken: environment.line.messagingAccessToken });
   for (const row of notificationRows) {
@@ -129,7 +143,10 @@ export async function runWorkerCycle(
         return await rpc(admin, "fail_line_delivery_server", { target_delivery_id: id, target_error_code: safeErrorCode }) as "queued" | "dead_letter" | "unchanged";
       },
     }, lineDriver);
-    if (result.status !== "retry_scheduled") {
+    const notificationTerminal = result.status === "not_deliverable"
+      ? Boolean(await rpc(admin, "line_delivery_terminal_server", { target_delivery_id: message.data.notificationId }))
+      : result.status !== "retry_scheduled";
+    if (notificationTerminal) {
       await rpc(admin, "archive_line_notification_job_server", { message_id: row.message_id });
     }
     summary.lineNotifications += 1;

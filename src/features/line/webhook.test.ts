@@ -3,6 +3,17 @@ import { createHmac } from "node:crypto";
 import { verifyLineWebhookSignature, normalizeLineWebhook } from "./webhook";
 
 describe("LINE webhook boundary", () => {
+  it("stores only protected identity for direct messages and never for group messages", () => {
+    const protect = (subject: string) => ({ subjectHash: `hash-${subject.length}`, destination: "encrypted" });
+    const events = ["user", "group"].map((type, index) => ({
+      webhookEventId: `event-${index}`, type: "message", timestamp: 1,
+      source: { type, userId: "Uprivate" }, message: { type: "text", id: "m", text: "search" },
+    }));
+    const result = normalizeLineWebhook(JSON.stringify({ events }), protect);
+    expect(result[0]).toMatchObject({ subjectHash: "hash-8", destination: "encrypted" });
+    expect(result[1]).not.toHaveProperty("destination");
+    expect(JSON.stringify(result)).not.toContain("Uprivate");
+  });
   it("verifies the exact raw body and rejects tampering", () => {
     const body = '{"events":[]}';
     const signature = createHmac("sha256", "development-secret").update(body).digest("base64");

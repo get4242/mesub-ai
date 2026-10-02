@@ -16,12 +16,13 @@ export async function handleLineWebhook(
   signature: string | null,
   config: { secret: string; environment: "development" | "review" | "production" },
   repository: LineWebhookRepository,
+  protectIdentity?: (subject: string) => { subjectHash: string; destination: string },
 ) {
   if (!verifyLineWebhookSignature(rawBody, signature, config.secret))
     return { status: 401, outcome: "rejected" as const };
   let events: ReturnType<typeof normalizeLineWebhook>;
   try {
-    events = normalizeLineWebhook(rawBody);
+    events = normalizeLineWebhook(rawBody, protectIdentity);
   } catch {
     return { status: 400, outcome: "invalid" as const };
   }

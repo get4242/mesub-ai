@@ -1,0 +1,14 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+select plan(7);
+select ok((select relrowsecurity from pg_class where oid='public.line_intake_sessions'::regclass),'intake sessions have RLS');
+select ok(not has_table_privilege('authenticated','public.line_intake_sessions','select'),'draft evidence is not exposed across tenants');
+select ok(not has_function_privilege('authenticated','public.line_intake_decide_server(text,text,text,uuid,text,integer)','execute'),'unverified clients cannot confirm LINE intake');
+select ok(not has_function_privilege('anon','public.line_intake_draft_server(text,text,text,uuid,text,jsonb)','execute'),'anonymous clients cannot create drafts through worker bridge');
+select ok(not (select public from storage.buckets where id='property-published'),'draft images stay in a private bucket');
+set local "request.jwt.claims"='{"role":"service_role"}';
+select throws_ok($$select public.line_intake_session_server('test','development',repeat('b',64),true)$$,'42501','AGENT_LINK_REQUIRED','unknown LINE identity cannot start intake');
+set local "request.jwt.claims"='{"role":"authenticated"}';
+select throws_ok($$select public.line_intake_session_server('test','development',repeat('b',64),true)$$,'42501','FORBIDDEN','JWT role is checked inside trusted bridge');
+select * from finish();
+rollback;

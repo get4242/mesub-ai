@@ -2,5 +2,9 @@ strictDepBuilds: true
 confirmModulesPurge: false
 allowBuilds:
   unrs-resolver: true
+overrides:
+  js-yaml: 4.3.2
+  minimatch@3>brace-expansion: 1.1.20
+  minimatch@10>brace-expansion: 5.0.11
 minimumReleaseAgeExclude:
   - openai@7.8.0

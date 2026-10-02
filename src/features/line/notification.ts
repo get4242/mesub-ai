@@ -24,16 +24,18 @@ export function createFakeLineNotificationDriver(): LineNotificationDriver {
 export function createLineMessagingDriver(accessToken: string, request: typeof fetch = fetch): LineNotificationDriver {
   if (!accessToken) throw new Error("LINE_ACCESS_TOKEN_REQUIRED");
   return {
-    async deliver({ destination, message }) {
+    async deliver({ notificationId, destination, message }) {
       if (!destination || !message) throw new Error("LINE_DELIVERY_INPUT_INVALID");
       const response = await request("https://api.line.me/v2/bot/message/push", {
         method: "POST",
-        headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+        headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json", "X-Line-Retry-Key": notificationId },
         body: JSON.stringify({ to: destination, messages: [{ type: "text", text: message.slice(0, 500) }] }),
         cache: "no-store",
+        redirect: "error",
+        signal: AbortSignal.timeout(15000),
       });
-      if (!response.ok) throw new Error("LINE_DELIVERY_FAILED");
-      return { provider: "line-messaging-api", receiptId: crypto.randomUUID() };
+      if (!response.ok && !(response.status === 409 && response.headers.get("x-line-accepted-request-id"))) throw new Error("LINE_DELIVERY_FAILED");
+      return { provider: "line-messaging-api", receiptId: response.headers.get("x-line-request-id") ?? response.headers.get("x-line-accepted-request-id") ?? notificationId };
     },
   };
 }

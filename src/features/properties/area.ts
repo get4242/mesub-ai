@@ -1,7 +1,7 @@
 type AreaInput =
   | { unit: "sqm"; value: string }
   | { unit: "sqwah"; value: string }
-  | { unit: "rai_ngan_sqwah"; rai: number; ngan: number; sqwah: number };
+  | { unit: "rai_ngan_sqwah"; rai: number | string; ngan: number | string; sqwah: number | string };
 
 function decimalParts(value: string) {
   if (!/^\d+(?:\.\d+)?$/.test(value)) throw new Error("INVALID_AREA");
@@ -25,8 +25,10 @@ function multiplyDecimal(value: string, multiplier: bigint) {
 export function normalizeArea(input: AreaInput): { squareMetres: string } {
   if (input.unit === "sqm") return { squareMetres: multiplyDecimal(input.value, 1n) };
   if (input.unit === "sqwah") return { squareMetres: multiplyDecimal(input.value, 4n) };
-  if (![input.rai, input.ngan, input.sqwah].every(Number.isInteger) || input.rai < 0 || input.ngan < 0 || input.sqwah < 0) {
+  if (![input.rai, input.ngan].every((value) => /^\d+$/.test(String(value)))) {
     throw new Error("INVALID_AREA");
   }
-  return { squareMetres: String(input.rai * 1600 + input.ngan * 400 + input.sqwah * 4) };
+  const wah = decimalParts(String(input.sqwah));
+  const factor = 10n ** BigInt(wah.scale);
+  return { squareMetres: formatDecimal((BigInt(input.rai) * 1600n + BigInt(input.ngan) * 400n) * factor + wah.integer * 4n, wah.scale) };
 }
