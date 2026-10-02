@@ -15,7 +15,7 @@ export type MediaUploadInput = {
 type UploadingMedia = MediaUploadInput & {
   id: string;
   tenantId: string;
-  bucketId: "property-intake";
+  bucketId: "property-published";
   objectPath: string;
   position: number;
 };
@@ -37,7 +37,7 @@ export async function prepareMediaUpload(input: MediaUploadInput, context: Agent
   if (count >= 20) return { ok: false as const, code: "MEDIA_LIMIT_REACHED", message: "ทรัพย์หนึ่งรายการเพิ่มรูปได้สูงสุด 20 รูป" };
   const id = createId();
   const objectPath = buildPropertyMediaPath(context.tenantId, input.propertyId, id, input.originalFilename);
-  await repository.insertUploading({ ...input, id, tenantId: context.tenantId, bucketId: "property-intake", objectPath, position: count });
+  await repository.insertUploading({ ...input, id, tenantId: context.tenantId, bucketId: "property-published", objectPath, position: count });
   const uploadToken = await repository.createUploadToken(objectPath);
-  return { ok: true as const, data: { mediaId: id, bucketId: "property-intake" as const, objectPath, uploadToken } };
+  return { ok: true as const, data: { mediaId: id, bucketId: "property-published" as const, objectPath, uploadToken } };
 }

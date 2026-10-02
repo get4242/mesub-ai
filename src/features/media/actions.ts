@@ -26,7 +26,7 @@ export async function requestPropertyMediaUploadAction(input: MediaUploadInput) 
       if (error) throw error;
     },
     async createUploadToken(path) {
-      const { data, error } = await supabase.storage.from("property-intake").createSignedUploadUrl(path, { upsert: false });
+      const { data, error } = await supabase.storage.from("property-published").createSignedUploadUrl(path, { upsert: false });
       if (error) throw error;
       return data.token;
     }
@@ -37,14 +37,14 @@ export async function requestPropertyMediaUploadAction(input: MediaUploadInput) 
 export async function finalizePropertyMediaAction(mediaId: string) {
   const context = await requireAgentContext();
   const supabase = await createClient();
-  const { data: media, error } = await supabase.from("property_media").select("id,object_path,property_id,status,mime_type,byte_size,width,height,checksum_sha256").eq("id", mediaId).eq("tenant_id", context.tenantId).eq("status", "uploading").maybeSingle();
+  const { data: media, error } = await supabase.from("property_media").select("id,bucket_id,object_path,property_id,status,mime_type,byte_size,width,height,checksum_sha256").eq("id", mediaId).eq("tenant_id", context.tenantId).eq("status", "uploading").maybeSingle();
   if (error || !media) return { ok: false as const, code: "NOT_FOUND" };
   const slash = media.object_path.lastIndexOf("/");
   const folder = media.object_path.slice(0, slash);
   const filename = media.object_path.slice(slash + 1);
-  const { data: objects, error: listError } = await supabase.storage.from("property-intake").list(folder, { search: filename, limit: 2 });
+  const { data: objects, error: listError } = await supabase.storage.from(media.bucket_id).list(folder, { search: filename, limit: 2 });
   if (listError || !objects?.some((object) => object.name === filename)) return { ok: false as const, code: "UPLOAD_INCOMPLETE" };
-  const { data: uploaded, error: downloadError } = await supabase.storage.from("property-intake").download(media.object_path);
+  const { data: uploaded, error: downloadError } = await supabase.storage.from(media.bucket_id).download(media.object_path);
   if (downloadError || !uploaded) return { ok: false as const, code: "UPLOAD_INCOMPLETE" };
   const bytes = new Uint8Array(await uploaded.arrayBuffer());
   try {

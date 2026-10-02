@@ -23,7 +23,7 @@ describe("prepareMediaUpload", () => {
     };
     const result = await prepareMediaUpload(input, context, repository, () => "20000000-0000-4000-8000-000000000001");
     expect(result).toMatchObject({ ok: true, data: { uploadToken: "token" } });
-    expect(inserted).toMatchObject({ tenantId: "tenant-a", propertyId: input.propertyId, bucketId: "property-intake" });
+    expect(inserted).toMatchObject({ tenantId: "tenant-a", propertyId: input.propertyId, bucketId: "property-published" });
     expect(inserted?.objectPath).toMatch(/^tenant-a\/550e8400-e29b-41d4-a716-446655440000\/20000000-/);
   });
 
