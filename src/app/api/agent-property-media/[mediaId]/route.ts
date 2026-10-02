@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAgentContext } from "@/lib/auth/require-agent-context";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -9,8 +9,8 @@ export async function GET(
   { params }: { params: Promise<{ mediaId: string }> },
 ) {
   const context = await requireAgentContext();
-  const supabase = await createClient();
-  const { data: media } = await supabase
+  const admin = createAdminClient();
+  const { data: media } = await admin
     .from("property_media")
     .select("bucket_id,object_path,mime_type")
     .eq("id", (await params).mediaId)
@@ -19,7 +19,7 @@ export async function GET(
     .maybeSingle();
   if (!media) return NextResponse.json({ found: false }, { status: 404 });
 
-  const { data: file, error } = await supabase.storage
+  const { data: file, error } = await admin.storage
     .from(media.bucket_id)
     .download(media.object_path);
   if (error || !file) return NextResponse.json({ found: false }, { status: 404 });

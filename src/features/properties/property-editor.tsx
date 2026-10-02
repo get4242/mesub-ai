@@ -111,9 +111,8 @@ export function PropertyEditor({
       const supabase = createClient();
       const uploaded = await supabase.storage
         .from(request.data.bucketId)
-        .uploadToSignedUrl(
+        .upload(
           request.data.objectPath,
-          request.data.uploadToken,
           file,
           { contentType: file.type, upsert: false },
         );
@@ -316,15 +315,23 @@ export function PropertyEditor({
               className={`media-card ${index === 0 ? "cover" : ""}`}
               key={row.id}
             >
-              {/* Authenticated media cannot use the public image optimizer because it must keep the Agent session. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`/api/agent-property-media/${row.id}`}
-                alt={index === 0 ? `ภาพปก ${row.original_filename}` : row.original_filename}
-              />
+              {row.status === "ready" ? (
+                <>
+                  {/* Authenticated media cannot use the public image optimizer because it must keep the Agent session. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/api/agent-property-media/${row.id}`}
+                    alt={index === 0 ? `ภาพปก ${row.original_filename}` : row.original_filename}
+                  />
+                </>
+              ) : (
+                <div className="media-placeholder">
+                  อัปโหลดไม่สมบูรณ์<br />นำออกแล้วเลือกไฟล์นี้อีกครั้ง
+                </div>
+              )}
               <div className="media-meta">
                 <b>{row.original_filename}</b>
-                <span className="muted">{row.status}</span>
+                <span className="muted">{row.status === "ready" ? "พร้อมใช้" : "อัปโหลดไม่สมบูรณ์"}</span>
               </div>
               <div className="media-actions">
                 <button

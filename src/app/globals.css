@@ -675,6 +675,17 @@ button {
   gap: 6px;
   justify-content: space-between;
 }
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 10px;
+}
+.actions button {
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
 .media-actions button {
   min-height: 38px;
   padding: 7px 9px;
@@ -878,6 +889,9 @@ button {
     padding: 0;
     border-radius: 50%;
     font-size: 0;
+  }
+  .agent-layout:has(.property-form) .sidebar-add {
+    display: none;
   }
   .sidebar-add:after {
     content: "+";
