@@ -10,6 +10,7 @@ import { Brand } from "@/components/public-shell";
 type Props = {
   mode: "login" | "signup";
   action(formData: FormData): Promise<AuthActionResult>;
+  notice?: string;
 };
 
 function SubmitButton({ label }: { label: string }) {
@@ -17,7 +18,7 @@ function SubmitButton({ label }: { label: string }) {
   return <button type="submit" disabled={pending}>{pending ? "กำลังดำเนินการ…" : label}</button>;
 }
 
-export function AuthForm({ mode, action }: Props) {
+export function AuthForm({ mode, action, notice }: Props) {
   const router = useRouter();
   const [result, formAction] = useActionState<AuthActionResult | null, FormData>(
     async (_previous, formData) => action(formData),
@@ -35,6 +36,7 @@ export function AuthForm({ mode, action }: Props) {
       <Brand />
       <form action={formAction} className="panel">
       <h1>{signup ? "สมัคร Agent" : "เข้าสู่ระบบ Agent"}</h1>
+      {notice ? <p className="auth-notice" role="status" aria-live="polite">{notice}</p> : null}
       {signup ? (
         <div className="auth-field">
           <label htmlFor="displayName">ชื่อที่ใช้แสดง</label>

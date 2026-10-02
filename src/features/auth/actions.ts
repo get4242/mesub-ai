@@ -44,12 +44,7 @@ export async function signupAction(formData: FormData): Promise<AuthActionResult
     }
   });
   if (error || !data.user) return { ok: false, code: "AUTH_UNAVAILABLE", message: "สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่" };
-  return {
-    ok: true,
-    message: data.user.email_confirmed_at
-      ? "สมัครสมาชิกและยืนยันบัญชีสำเร็จ คุณเข้าสู่ระบบได้ทันที"
-      : "สมัครสมาชิกสำเร็จ กรุณาตรวจสอบอีเมลและกดยืนยันบัญชีก่อนเข้าสู่ระบบ"
-  };
+  redirect(data.session ? "/login?signup=confirmed" : "/login?signup=check-email");
 }
 
 export async function forgotPasswordAction(formData: FormData): Promise<AuthActionResult> {
