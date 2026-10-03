@@ -57,6 +57,18 @@ export async function POST(request: Request) {
       if (error) throw error;
       return count ?? 0;
     },
+    async nextPosition(targetPropertyId, tenantId) {
+      const { data, error } = await admin
+        .from("property_media")
+        .select("position")
+        .eq("property_id", targetPropertyId)
+        .eq("tenant_id", tenantId)
+        .order("position", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.position ?? -1) + 1;
+    },
     async insertUploading(value) {
       const { error } = await admin.from("property_media").insert({
         id: value.id, tenant_id: value.tenantId, property_id: value.propertyId,
@@ -105,7 +117,7 @@ export async function POST(request: Request) {
     media: {
       id: prepared.data.mediaId,
       original_filename: file.name,
-      position: await repository.countActive(propertyId, context.tenantId) - 1,
+      position: prepared.data.position,
       status: "ready",
     },
   });

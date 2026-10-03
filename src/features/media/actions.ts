@@ -16,6 +16,11 @@ export async function requestPropertyMediaUploadAction(input: MediaUploadInput) 
       if (error) throw error;
       return count ?? 0;
     },
+    async nextPosition(propertyId, tenantId) {
+      const { data, error } = await supabase.from("property_media").select("position").eq("property_id", propertyId).eq("tenant_id", tenantId).order("position", { ascending: false }).limit(1).maybeSingle();
+      if (error) throw error;
+      return (data?.position ?? -1) + 1;
+    },
     async insertUploading(value) {
       const { error } = await supabase.from("property_media").insert({
         id: value.id, tenant_id: value.tenantId, property_id: value.propertyId, bucket_id: value.bucketId,

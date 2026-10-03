@@ -22,6 +22,7 @@ type UploadingMedia = MediaUploadInput & {
 
 export type MediaRepository = {
   countActive(propertyId: string, tenantId: string): Promise<number>;
+  nextPosition(propertyId: string, tenantId: string): Promise<number>;
   insertUploading(input: UploadingMedia): Promise<void>;
   createUploadToken(path: string): Promise<string>;
 };
@@ -35,9 +36,12 @@ export async function prepareMediaUpload(input: MediaUploadInput, context: Agent
   }
   const count = await repository.countActive(input.propertyId, context.tenantId);
   if (count >= 20) return { ok: false as const, code: "MEDIA_LIMIT_REACHED", message: "ทรัพย์หนึ่งรายการเพิ่มรูปได้สูงสุด 20 รูป" };
+  // Archived rows retain their original positions. Use the next unused position rather
+  // than the active row count so a new upload never collides with an archived image.
+  const position = await repository.nextPosition(input.propertyId, context.tenantId);
   const id = createId();
   const objectPath = buildPropertyMediaPath(context.tenantId, input.propertyId, id, input.originalFilename);
-  await repository.insertUploading({ ...input, id, tenantId: context.tenantId, bucketId: "property-published", objectPath, position: count });
+  await repository.insertUploading({ ...input, id, tenantId: context.tenantId, bucketId: "property-published", objectPath, position });
   const uploadToken = await repository.createUploadToken(objectPath);
-  return { ok: true as const, data: { mediaId: id, bucketId: "property-published" as const, objectPath, uploadToken } };
+  return { ok: true as const, data: { mediaId: id, bucketId: "property-published" as const, objectPath, position, uploadToken } };
 }
