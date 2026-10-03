@@ -589,6 +589,17 @@ button {
   object-fit: cover;
   background: linear-gradient(145deg, #d8ebe4, #7faa97);
 }
+.agent-sidebar nav i {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  color: #075a35;
+}
+.agent-sidebar nav i svg {
+  width: 23px;
+  height: 23px;
+}
 .property-public-facts {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   margin: 24px 0;
@@ -997,7 +1008,18 @@ button {
     flex-direction: column;
     gap: 0;
     padding: 4px 2px;
-    font-size: 10px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #25443a;
+  }
+  .agent-sidebar nav i {
+    width: 27px;
+    height: 27px;
+    margin-bottom: 2px;
+  }
+  .agent-sidebar nav i svg {
+    width: 25px;
+    height: 25px;
   }
   .agent-sidebar nav span {
     display: block;

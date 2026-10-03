@@ -7,6 +7,7 @@ import {
 import { PropertyEditor } from "@/features/properties/property-editor";
 import { statusCopy, statusDescription } from "@/features/properties/ui-model";
 import { formatPropertyPrice } from "@/features/properties/price-display";
+import { formatLandArea } from "@/features/properties/land-area-display";
 
 export default async function EditPropertyPage({
   params,
@@ -39,7 +40,7 @@ export default async function EditPropertyPage({
             <strong>{formatPropertyPrice(property)}</strong>
             <div className="property-facts-summary">
               <span><b>ทำเล</b>{property.district}, {property.province}</span>
-              <span><b>ที่ดิน</b>{property.land_area_sqm ? `${Number(property.land_area_sqm).toLocaleString("th-TH")} ตร.ม.` : "ยังไม่ระบุ"}</span>
+              <span><b>ที่ดิน</b>{formatLandArea(property.land_area_sqm)}</span>
               <span><b>รูปภาพ</b>{media.length} รูป</span>
             </div>
             <p>{statusDescription[property.status] ?? ""}</p>

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { toPublicPropertyCard } from "@/features/properties/public-view-model";
 import { PublicPropertyGallery } from "@/features/properties/public-property-gallery";
 import { LeadForm } from "@/features/leads/LeadForm";
+import { formatLandArea } from "@/features/properties/land-area-display";
 
 // The public listing is sourced from Supabase at request time.  Keeping this
 // route dynamic also keeps the document title in sync with a newly published
@@ -52,7 +53,7 @@ export default async function PropertyDetailPage({
     .order("position");
   const card = toPublicPropertyCard(property);
   const facts = [
-    property.land_area_sqm ? { label: "ขนาดที่ดิน", value: `${Number(property.land_area_sqm).toLocaleString("th-TH")} ตร.ม.` } : null,
+    property.land_area_sqm ? { label: "ขนาดที่ดิน", value: formatLandArea(property.land_area_sqm) } : null,
     property.building_area_sqm ? { label: "พื้นที่ใช้สอย", value: `${Number(property.building_area_sqm).toLocaleString("th-TH")} ตร.ม.` } : null,
     property.bedrooms ? { label: "ห้องนอน", value: `${property.bedrooms} ห้อง` } : null,
     property.bathrooms ? { label: "ห้องน้ำ", value: `${property.bathrooms} ห้อง` } : null,
