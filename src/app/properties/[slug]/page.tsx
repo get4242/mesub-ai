@@ -7,6 +7,7 @@ import { toPublicPropertyCard } from "@/features/properties/public-view-model";
 import { PublicPropertyGallery } from "@/features/properties/public-property-gallery";
 import { LeadForm } from "@/features/leads/LeadForm";
 import { formatLandArea } from "@/features/properties/land-area-display";
+import { PropertyDescriptionView } from "@/features/properties/property-description-view";
 
 // The public listing is sourced from Supabase at request time.  Keeping this
 // route dynamic also keeps the document title in sync with a newly published
@@ -87,7 +88,7 @@ export default async function PropertyDetailPage({
               </div>
             ) : null}
             <h2>รายละเอียดทรัพย์</h2>
-            <p>{property.description}</p>
+            <PropertyDescriptionView description={property.description} />
             <div className="privacy-note">
               <b>ข้อมูลทำเลแบบจำกัดการเปิดเผย</b>
               <br />
