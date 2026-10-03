@@ -247,6 +247,16 @@ export function PropertyEditor({
         </footer>
       </form>
       <div className="actions">
+        {property.status === "published" ? (
+          <a
+            className="button-line"
+            href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(`https://mesub-ai.vercel.app/properties/${property.id}`)}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            แชร์ประกาศผ่าน LINE
+          </a>
+        ) : null}
         {property.status === "draft" ? (
           <button
             disabled={pending}

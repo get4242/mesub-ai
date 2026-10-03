@@ -21,6 +21,8 @@ export default async function PropertiesPage() {
     { count },
     { data: publicProperties },
     readyMedia,
+    { count: leadCount },
+    { count: appointmentCount },
   ] =
     await Promise.all([
       client
@@ -35,6 +37,8 @@ export default async function PropertiesPage() {
         .eq("status", "published"),
       client.from("public_properties").select("id,slug"),
       listAgentReadyPropertyMedia(properties.map((property) => property.id)),
+      client.from("leads").select("id", { count: "exact", head: true }).eq("tenant_id", context.tenantId),
+      client.from("appointments").select("id", { count: "exact", head: true }).eq("tenant_id", context.tenantId),
     ]);
   const limit =
     (entitlement as { active_property_limit?: number } | null)
@@ -49,13 +53,19 @@ export default async function PropertiesPage() {
   );
   return (
     <>
-      <header className="agent-topbar">
+      <header className="agent-hero">
+        <p>สวัสดีค่ะ · จัดการประกาศของคุณได้ที่นี่</p>
         <h1>ทรัพย์ของฉัน</h1>
+        <div className="agent-summary">
+          <span><b>{count ?? 0}</b> เผยแพร่แล้ว</span>
+          <span><b>{leadCount ?? 0}</b> ลูกค้าสนใจ</span>
+          <span><b>{appointmentCount ?? 0}</b> นัดหมาย</span>
+        </div>
       </header>
-      <main className="agent-content">
-        <div className="toolbar">
+      <main className="agent-content properties-content">
+        <div className="toolbar property-toolbar">
           <div>
-            <h2>ทรัพย์ทั้งหมด {properties.length} รายการ</h2>
+            <h2>รายการทรัพย์ {properties.length} รายการ</h2>
             <p className="muted">
               {quota.label} · {quota.remaining}
             </p>
@@ -63,6 +73,11 @@ export default async function PropertiesPage() {
           <Link className="button" href="/dashboard/properties/new">
             + เพิ่มทรัพย์
           </Link>
+        </div>
+        <div className="property-tools">
+          <input aria-label="ค้นหาทรัพย์" placeholder="🔎 ค้นหาชื่อทรัพย์ / ทำเล" />
+          <Link className="button-secondary" href="/dashboard/leads">☎ ลูกค้าที่สนใจ ({leadCount ?? 0})</Link>
+          <Link className="button-secondary" href="/dashboard/appointments">📅 นัดหมาย</Link>
         </div>
         {!properties.length ? (
           <div className="empty-state">
@@ -80,7 +95,7 @@ export default async function PropertiesPage() {
                 false,
               );
               return (
-                <article className="property-row" key={property.id}>
+                <article className="property-row property-listing-card" key={property.id}>
                   {covers.get(property.id) ? (
                     <Image
                       className="property-thumb"
@@ -95,6 +110,8 @@ export default async function PropertiesPage() {
                   )}
                   <div>
                     <h3>{property.title}</h3>
+                    <strong className="property-row-price">฿{Number(property.price).toLocaleString("th-TH")}</strong>
+                    <p className="muted">📍 {property.district}, {property.province}</p>
                     <span className="muted">
                       อัปเดตล่าสุด{" "}
                       {new Date(property.updated_at).toLocaleDateString(
@@ -129,6 +146,16 @@ export default async function PropertiesPage() {
                       >
                         ดูประกาศ
                       </Link>
+                    ) : null}
+                    {actions.includes("view") ? (
+                      <a
+                        className="button-line"
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(`https://mesub-ai.vercel.app/properties/${slugs.get(property.id) ?? property.id}`)}`}
+                      >
+                        แชร์ LINE
+                      </a>
                     ) : null}
                     {actions.includes("publish") ? (
                       <form action={publishPropertyFormAction}>
