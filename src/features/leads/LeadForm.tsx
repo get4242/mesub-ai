@@ -58,7 +58,7 @@ export function LeadForm({ propertyId }: { propertyId?: string }) {
       </button>
       <p className="status-message" role="status" aria-live="polite">
         {status === "accepted"
-          ? "รับข้อมูลแล้ว เราจะส่งต่อให้ผู้รับผิดชอบ"
+          ? "ส่งข้อมูลสำเร็จแล้ว Agent ผู้รับผิดชอบจะเห็นข้อมูลในระบบและติดต่อกลับ"
           : status === "rate_limited"
             ? "ส่งคำขอถี่เกินไป กรุณาลองใหม่ภายหลัง"
             : status === "error"
