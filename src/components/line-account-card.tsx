@@ -4,12 +4,13 @@ import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-type LiffApi = {
+export type LiffApi = {
   init(input: { liffId: string }): Promise<void>;
   isInClient(): boolean;
   isLoggedIn(): boolean;
   login(input?: { redirectUri?: string }): void;
   getIDToken(): string | null;
+  shareTargetPicker?(messages: Array<Record<string, unknown>>): Promise<unknown>;
 };
 
 declare global { interface Window { liff?: LiffApi } }

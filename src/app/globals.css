@@ -630,6 +630,8 @@ button {
 .property-row p { margin: 4px 0 0; font-size: 13px; }
 .button-line { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 8px 12px; border-radius: 10px; background: #06c755; color: #fff; font-weight: 800; font-size: 12px; }
 .button-line:hover { background: #05a947; color: #fff; }
+.line-flex-share { display: grid; gap: 4px; }
+.line-flex-share .hint { margin: 0; max-width: 240px; font-size: 12px; }
 .property-slider-main {
   position: relative;
   overflow: hidden;

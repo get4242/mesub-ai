@@ -13,6 +13,7 @@ import {
   quotaCopy,
 } from "@/features/properties/ui-model";
 import { formatPropertyPrice } from "@/features/properties/price-display";
+import { LineFlexShareButton } from "@/components/line-flex-share-button";
 export default async function PropertiesPage() {
   const properties = await listAgentProperties();
   const context = await requireAgentContext();
@@ -149,14 +150,19 @@ export default async function PropertiesPage() {
                       </Link>
                     ) : null}
                     {actions.includes("view") ? (
-                      <a
-                        className="button-line"
-                        target="_blank"
-                        rel="noreferrer"
-                        href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(`https://mesub-ai.vercel.app/properties/${slugs.get(property.id) ?? property.id}`)}`}
-                      >
-                        แชร์ LINE
-                      </a>
+                      <LineFlexShareButton
+                        liffId={process.env.LINE_MINI_APP_LIFF_ID ?? null}
+                        property={{
+                          title: property.title,
+                          propertyType: property.property_type,
+                          price: formatPropertyPrice(property),
+                          location: `${property.district}, ${property.province}`,
+                          url: `https://mesub-ai.vercel.app/properties/${slugs.get(property.id) ?? property.id}`,
+                          imageUrl: covers.get(property.id)
+                            ? `https://mesub-ai.vercel.app/api/public-property-media/${covers.get(property.id)}`
+                            : undefined,
+                        }}
+                      />
                     ) : null}
                     {actions.includes("publish") ? (
                       <form action={publishPropertyFormAction}>
