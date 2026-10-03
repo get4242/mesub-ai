@@ -45,6 +45,12 @@ export default async function PropertyDetailPage({
     .eq("property_id", property.id)
     .order("position");
   const card = toPublicPropertyCard(property);
+  const facts = [
+    property.land_area_sqm ? { label: "ขนาดที่ดิน", value: `${Number(property.land_area_sqm).toLocaleString("th-TH")} ตร.ม.` } : null,
+    property.building_area_sqm ? { label: "พื้นที่ใช้สอย", value: `${Number(property.building_area_sqm).toLocaleString("th-TH")} ตร.ม.` } : null,
+    property.bedrooms ? { label: "ห้องนอน", value: `${property.bedrooms} ห้อง` } : null,
+    property.bathrooms ? { label: "ห้องน้ำ", value: `${property.bathrooms} ห้อง` } : null,
+  ].filter((fact): fact is { label: string; value: string } => Boolean(fact));
   return (
     <PublicShell>
       <main className="public-main">
@@ -63,24 +69,16 @@ export default async function PropertyDetailPage({
             <h1>{card.title}</h1>
             <p className="muted">{card.location}</p>
             <strong className="price">{card.price}</strong>
-            <div className="facts">
-              <div>
-                <b>{property.bedrooms ?? "—"}</b>
-                <span>ห้องนอน</span>
+            {facts.length ? (
+              <div className="facts property-public-facts">
+                {facts.map((fact) => (
+                  <div key={fact.label}>
+                    <span>{fact.label}</span>
+                    <b>{fact.value}</b>
+                  </div>
+                ))}
               </div>
-              <div>
-                <b>{property.bathrooms ?? "—"}</b>
-                <span>ห้องน้ำ</span>
-              </div>
-              <div>
-                <b>{property.building_area_sqm ?? "—"}</b>
-                <span>ตร.ม. ใช้สอย</span>
-              </div>
-              <div>
-                <b>{property.land_area_sqm ?? "—"}</b>
-                <span>ตร.ม. ที่ดิน</span>
-              </div>
-            </div>
+            ) : null}
             <h2>รายละเอียดทรัพย์</h2>
             <p>{property.description}</p>
             <div className="privacy-note">

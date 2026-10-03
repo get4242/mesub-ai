@@ -589,6 +589,17 @@ button {
   object-fit: cover;
   background: linear-gradient(145deg, #d8ebe4, #7faa97);
 }
+.property-public-facts {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin: 24px 0;
+}
+.property-public-facts div {
+  display: grid;
+  gap: 5px;
+  text-align: left;
+}
+.property-public-facts b { font-size: 18px; color: var(--ink); }
+.property-public-facts span { color: var(--muted); font-size: 13px; }
 .agent-hero {
   padding: 32px clamp(24px, 4vw, 56px) 38px;
   color: #fff;
