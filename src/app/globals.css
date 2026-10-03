@@ -572,10 +572,10 @@ button {
 }
 .property-row {
   display: grid;
-  grid-template-columns: 76px minmax(220px, 1fr) auto auto;
+  grid-template-columns: 132px minmax(220px, 1fr) auto auto;
   gap: 16px;
   align-items: center;
-  min-height: 94px;
+  min-height: 136px;
   padding: 16px;
   border-bottom: 1px solid var(--line);
 }
@@ -583,9 +583,9 @@ button {
   border: 0;
 }
 .property-thumb {
-  width: 76px;
-  height: 62px;
-  border-radius: 10px;
+  width: 132px;
+  height: 112px;
+  border-radius: 14px;
   object-fit: cover;
   background: linear-gradient(145deg, #d8ebe4, #7faa97);
 }
@@ -970,7 +970,7 @@ button {
     grid-template-columns: 1fr;
   }
   .property-row {
-    grid-template-columns: 76px 1fr;
+    grid-template-columns: 132px 1fr;
   }
   .property-row .status-badge,
   .row-actions {
@@ -1123,9 +1123,11 @@ button {
     grid-template-columns: 1fr;
   }
   .property-row {
-    grid-template-columns: 70px minmax(0, 1fr);
-    padding: 14px;
+    grid-template-columns: 132px minmax(0, 1fr);
+    gap: 14px;
+    padding: 16px 14px;
   }
+  .property-thumb { width: 132px; height: 120px; border-radius: 16px; }
   .property-row .status-badge {
     grid-column: 2;
   }
