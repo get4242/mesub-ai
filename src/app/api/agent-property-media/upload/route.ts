@@ -9,10 +9,21 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 export async function POST(request: Request) {
-  const formData = await request.formData();
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return NextResponse.json({ ok: false, message: "กรุณาเลือกรูปภาพอีกครั้ง" }, { status: 400 });
+  }
   const propertyId = formData.get("propertyId");
   const file = formData.get("file");
-  if (typeof propertyId !== "string" || !(file instanceof File)) {
+  if (
+    typeof propertyId !== "string" ||
+    !file ||
+    typeof file === "string" ||
+    typeof file.arrayBuffer !== "function" ||
+    typeof file.name !== "string"
+  ) {
     return NextResponse.json({ ok: false, message: "กรุณาเลือกรูปภาพอีกครั้ง" }, { status: 400 });
   }
 

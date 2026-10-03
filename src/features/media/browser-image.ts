@@ -7,7 +7,13 @@ function jpegName(name: string) {
 }
 
 export async function resizeImageForUpload(file: File): Promise<File> {
-  const bitmap = await createImageBitmap(file);
+  if (typeof createImageBitmap !== "function") return file;
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    return file;
+  }
   try {
     const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
     const width = Math.max(1, Math.round(bitmap.width * scale));
