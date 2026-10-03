@@ -14,16 +14,17 @@ export function propertyFlex(properties: LineProperty[], origin: string): LineMe
       type: "bubble",
       ...(p.media_id ? { hero: { type: "image", url: new URL(`/api/public-property-media/${p.media_id}`, origin).href, size: "full", aspectRatio: "20:13", aspectMode: "cover" } } : {}),
       body: { type: "box", layout: "vertical", spacing: "sm", contents: [
-        { type: "text", text: p.title.slice(0, 200), weight: "bold", wrap: true },
-        { type: "text", text: labels[p.property_type] ?? p.property_type, size: "sm" },
-        { type: "text", text: `${Number(p.price).toLocaleString("th-TH")} บาท`, weight: "bold" },
-        { type: "text", text: `${p.district} ${p.province}`, wrap: true, size: "sm" },
+        { type: "text", text: labels[p.property_type] ?? p.property_type, size: "xs", color: "#17633F", weight: "bold" },
+        { type: "text", text: p.title.slice(0, 200), weight: "bold", size: "lg", wrap: true, color: "#14352B" },
+        { type: "separator", margin: "md", color: "#D9E7DF" },
+        { type: "text", text: `฿${Number(p.price).toLocaleString("th-TH")}`, weight: "bold", size: "xl", color: "#075A35", margin: "md" },
+        { type: "text", text: `📍 ${p.district}, ${p.province}`, wrap: true, size: "sm", color: "#60726B" },
       ] },
       footer: { type: "box", layout: "vertical", contents: [
-        { type: "button", action: { type: "postback", label: "รายละเอียดในแชต", data: `detail:${p.id}` } },
-        { type: "button", action: { type: "uri", label: "ดูรายละเอียด", uri: url } },
-        { type: "button", action: { type: "uri", label: "แชร์", uri: `https://line.me/R/share?text=${encodeURIComponent(p.title + " " + url)}` } },
-        { type: "button", action: { type: "postback", label: "นัดชมทรัพย์", data: `appointment:${p.id}`, displayText: `นัดชม ${p.title.slice(0, 100)}` } },
+        { type: "button", style: "primary", color: "#075A35", action: { type: "uri", label: "ดูรายละเอียด", uri: url } },
+        { type: "button", style: "secondary", margin: "sm", action: { type: "postback", label: "รายละเอียดในแชต", data: `detail:${p.id}` } },
+        { type: "button", style: "link", margin: "sm", action: { type: "postback", label: "นัดชมทรัพย์", data: `appointment:${p.id}`, displayText: `นัดชม ${p.title.slice(0, 100)}` } },
+        { type: "button", style: "link", action: { type: "uri", label: "แชร์ให้เพื่อน", uri: `https://line.me/R/share?text=${encodeURIComponent(p.title + " " + url)}` } },
       ] },
     };
   });

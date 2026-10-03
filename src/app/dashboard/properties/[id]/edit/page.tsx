@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import {
   getAgentProperty,
   listPropertyMedia,
@@ -23,12 +24,26 @@ export default async function EditPropertyPage({
         <h1>แก้ไขข้อมูลทรัพย์</h1>
       </header>
       <main className="agent-content">
-        <div className="page-head">
-          <h1>{property.title}</h1>
-          <p>
-            สถานะ: {statusCopy[property.status] ?? property.status} · {statusDescription[property.status] ?? ""}
-          </p>
-        </div>
+        <section className="property-detail-summary">
+          {media.length ? (
+            <div className="property-detail-images">
+              {media.slice(0, 3).map((item, index) => (
+                <Image key={item.id} src={`/api/agent-property-media/${item.id}`} alt={index === 0 ? `ภาพหลัก ${property.title}` : ""} width={900} height={620} unoptimized />
+              ))}
+            </div>
+          ) : null}
+          <div className="property-detail-copy">
+            <span className={`status-badge status-${property.status}`}>{statusCopy[property.status] ?? property.status}</span>
+            <h1>{property.title}</h1>
+            <strong>฿{Number(property.price).toLocaleString("th-TH")}</strong>
+            <div className="property-facts-summary">
+              <span><b>ทำเล</b>{property.district}, {property.province}</span>
+              <span><b>ที่ดิน</b>{property.land_area_sqm ? `${Number(property.land_area_sqm).toLocaleString("th-TH")} ตร.ม.` : "ยังไม่ระบุ"}</span>
+              <span><b>รูปภาพ</b>{media.length} รูป</span>
+            </div>
+            <p>{statusDescription[property.status] ?? ""}</p>
+          </div>
+        </section>
         <PropertyEditor property={property} initialMedia={media} />
       </main>
     </>
