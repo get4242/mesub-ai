@@ -14,6 +14,7 @@ import {
 } from "@/features/media/actions";
 import { resizeImageForUpload } from "@/features/media/browser-image";
 import Link from "next/link";
+import { LineFlexShareButton } from "@/components/line-flex-share-button";
 
 type Property = {
   id: string;
@@ -40,9 +41,21 @@ type Media = {
 export function PropertyEditor({
   property,
   initialMedia,
+  shareProperty,
 }: {
   property: Property;
   initialMedia: Media[];
+  shareProperty?: {
+    liffId: string | null;
+    property: {
+      title: string;
+      propertyType: string;
+      price: string;
+      location: string;
+      url: string;
+      imageUrl?: string;
+    };
+  } | null;
 }) {
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
@@ -248,14 +261,7 @@ export function PropertyEditor({
       </form>
       <div className="actions">
         {property.status === "published" ? (
-          <a
-            className="button-line"
-            href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(`https://mesub-ai.vercel.app/properties/${property.id}`)}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            แชร์ประกาศผ่าน LINE
-          </a>
+          shareProperty ? <LineFlexShareButton {...shareProperty} /> : null
         ) : null}
         {property.status === "draft" ? (
           <button

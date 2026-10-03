@@ -20,6 +20,7 @@ export default async function EditPropertyPage({
     listPropertyMedia(id),
   ]);
   if (!property) notFound();
+  const cover = media.find((item) => item.status === "ready");
   return (
     <>
       <header className="agent-topbar">
@@ -40,7 +41,27 @@ export default async function EditPropertyPage({
             <p>{statusDescription[property.status] ?? ""}</p>
           </div>
         </section>
-        <PropertyEditor property={property} initialMedia={media} />
+        <PropertyEditor
+          property={property}
+          initialMedia={media}
+          shareProperty={
+            property.status === "published"
+              ? {
+                  liffId: process.env.LINE_MINI_APP_LIFF_ID ?? null,
+                  property: {
+                    title: property.title,
+                    propertyType: property.property_type,
+                    price: formatPropertyPrice(property),
+                    location: `${property.district}, ${property.province}`,
+                    url: `https://mesub-ai.vercel.app/properties/${property.id}`,
+                    imageUrl: cover
+                      ? `https://mesub-ai.vercel.app/api/public-property-media/${cover.id}`
+                      : undefined,
+                  },
+                }
+              : null
+          }
+        />
       </main>
     </>
   );
