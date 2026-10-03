@@ -6,6 +6,12 @@ import { createClient } from "@/lib/supabase/server";
 import { toPublicPropertyCard } from "@/features/properties/public-view-model";
 import { PublicPropertyGallery } from "@/features/properties/public-property-gallery";
 import { LeadForm } from "@/features/leads/LeadForm";
+
+// The public listing is sourced from Supabase at request time.  Keeping this
+// route dynamic also keeps the document title in sync with a newly published
+// listing instead of caching the temporary "not found" metadata.
+export const dynamic = "force-dynamic";
+
 async function getProperty(slug: string) {
   const client = await createClient();
   const { data } = await client
