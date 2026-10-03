@@ -1,3 +1,5 @@
+"use client";
+
 export function ConfirmationPanel({
   blocked,
   confirm,
