@@ -6,6 +6,7 @@ import {
 } from "@/features/properties/queries";
 import { PropertyEditor } from "@/features/properties/property-editor";
 import { statusCopy, statusDescription } from "@/features/properties/ui-model";
+import { formatPropertyPrice } from "@/features/properties/price-display";
 
 export default async function EditPropertyPage({
   params,
@@ -35,7 +36,7 @@ export default async function EditPropertyPage({
           <div className="property-detail-copy">
             <span className={`status-badge status-${property.status}`}>{statusCopy[property.status] ?? property.status}</span>
             <h1>{property.title}</h1>
-            <strong>฿{Number(property.price).toLocaleString("th-TH")}</strong>
+            <strong>{formatPropertyPrice(property)}</strong>
             <div className="property-facts-summary">
               <span><b>ทำเล</b>{property.district}, {property.province}</span>
               <span><b>ที่ดิน</b>{property.land_area_sqm ? `${Number(property.land_area_sqm).toLocaleString("th-TH")} ตร.ม.` : "ยังไม่ระบุ"}</span>

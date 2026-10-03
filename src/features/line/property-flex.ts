@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { formatPropertyPrice } from "@/features/properties/price-display";
 export const linePropertySchema = z.object({
   id: z.uuid(), slug: z.string(), title: z.string(), property_type: z.string(),
-  price: z.union([z.string().regex(/^\d+(?:\.\d+)?$/), z.number().nonnegative()]), province: z.string(), district: z.string(),
+  price: z.union([z.string().regex(/^\d+(?:\.\d+)?$/), z.number().nonnegative()]), land_area_sqm: z.union([z.string().regex(/^\d+(?:\.\d+)?$/), z.number().nonnegative()]).nullable().optional(), province: z.string(), district: z.string(),
   description: z.string().optional(), media_id: z.uuid().nullable().optional(),
 });
 export type LineProperty = z.infer<typeof linePropertySchema>;
@@ -17,7 +18,7 @@ export function propertyFlex(properties: LineProperty[], origin: string): LineMe
         { type: "text", text: labels[p.property_type] ?? p.property_type, size: "xs", color: "#17633F", weight: "bold" },
         { type: "text", text: p.title.slice(0, 200), weight: "bold", size: "lg", wrap: true, color: "#14352B" },
         { type: "separator", margin: "md", color: "#D9E7DF" },
-        { type: "text", text: `฿${Number(p.price).toLocaleString("th-TH")}`, weight: "bold", size: "xl", color: "#075A35", margin: "md" },
+        { type: "text", text: formatPropertyPrice(p), weight: "bold", size: "xl", color: "#075A35", margin: "md" },
         { type: "text", text: `📍 ${p.district}, ${p.province}`, wrap: true, size: "sm", color: "#60726B" },
       ] },
       footer: { type: "box", layout: "vertical", contents: [

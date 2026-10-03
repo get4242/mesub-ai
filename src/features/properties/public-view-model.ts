@@ -8,7 +8,10 @@ type PublicProjectionRow = {
   property_type: string;
   price: number | string;
   currency: string;
+  land_area_sqm?: number | string | null;
 };
+
+import { formatPropertyPrice } from "./price-display";
 
 export function toPublicPropertyCard(row: PublicProjectionRow) {
   return {
@@ -18,6 +21,6 @@ export function toPublicPropertyCard(row: PublicProjectionRow) {
     location: `${row.district}, ${row.province}`,
     listingType: row.listing_type,
     propertyType: row.property_type,
-    price: new Intl.NumberFormat("th-TH", { style: "currency", currency: row.currency, maximumFractionDigits: 0 }).format(Number(row.price))
+    price: formatPropertyPrice(row)
   };
 }

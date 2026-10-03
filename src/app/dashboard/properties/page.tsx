@@ -12,6 +12,7 @@ import {
   statusCopy,
   quotaCopy,
 } from "@/features/properties/ui-model";
+import { formatPropertyPrice } from "@/features/properties/price-display";
 export default async function PropertiesPage() {
   const properties = await listAgentProperties();
   const context = await requireAgentContext();
@@ -110,7 +111,7 @@ export default async function PropertiesPage() {
                   )}
                   <div>
                     <h3>{property.title}</h3>
-                    <strong className="property-row-price">฿{Number(property.price).toLocaleString("th-TH")}</strong>
+                    <strong className="property-row-price">{formatPropertyPrice(property)}</strong>
                     <p className="muted">📍 {property.district}, {property.province}</p>
                     <span className="muted">
                       อัปเดตล่าสุด{" "}
