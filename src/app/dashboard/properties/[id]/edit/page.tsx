@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import {
   getAgentProperty,
   listPropertyMedia,
@@ -8,6 +7,7 @@ import { PropertyEditor } from "@/features/properties/property-editor";
 import { statusCopy, statusDescription } from "@/features/properties/ui-model";
 import { formatPropertyPrice } from "@/features/properties/price-display";
 import { formatLandArea } from "@/features/properties/land-area-display";
+import { AgentPropertyGallery } from "@/features/properties/agent-property-gallery";
 
 export default async function EditPropertyPage({
   params,
@@ -27,13 +27,7 @@ export default async function EditPropertyPage({
       </header>
       <main className="agent-content">
         <section className="property-detail-summary">
-          {media.length ? (
-            <div className="property-detail-images">
-              {media.slice(0, 3).map((item, index) => (
-                <Image key={item.id} src={`/api/agent-property-media/${item.id}`} alt={index === 0 ? `ภาพหลัก ${property.title}` : ""} width={900} height={620} unoptimized />
-              ))}
-            </div>
-          ) : null}
+          <AgentPropertyGallery media={media} title={property.title} />
           <div className="property-detail-copy">
             <span className={`status-badge status-${property.status}`}>{statusCopy[property.status] ?? property.status}</span>
             <h1>{property.title}</h1>

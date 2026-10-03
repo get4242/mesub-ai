@@ -798,6 +798,16 @@ button {
   border-radius: 22px;
   background: #f7f3eb;
 }
+.agent-property-slider {
+  min-width: 0;
+}
+.agent-property-slider .property-slider-main {
+  height: clamp(300px, 40vw, 500px);
+  min-height: 0;
+}
+.agent-property-slider .property-slider-thumbnails {
+  padding-bottom: 2px;
+}
 .property-detail-images { display: grid; grid-template-columns: 1fr 120px; grid-template-rows: 1fr 1fr; gap: 8px; min-height: 290px; overflow: hidden; border-radius: 16px; }
 .property-detail-images img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
 .property-detail-images img:first-child { grid-row: 1 / 3; }
@@ -1043,6 +1053,7 @@ button {
     display: none;
   }
   .property-detail-summary { grid-template-columns: 1fr; padding: 14px; }
+  .agent-property-slider .property-slider-main { height: 74vw; min-height: 260px; }
   .property-detail-images { min-height: 250px; grid-template-columns: 1fr 92px; }
   .sidebar-add:after {
     content: "+";
