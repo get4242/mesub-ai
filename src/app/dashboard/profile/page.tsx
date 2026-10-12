@@ -39,13 +39,13 @@ export default async function ProfilePage() {
                   name="publicPhone"
                   defaultValue={profile.public_phone ?? ""}
                 />
-                <span>
+                <span className="visibility-toggle">
                   <input
                     name="showPhone"
                     type="checkbox"
                     defaultChecked={profile.show_phone}
-                  />{" "}
-                  แสดงโทรศัพท์
+                  />
+                  <b>แสดงโทรศัพท์บนเว็บไซต์</b>
                 </span>
               </label>
               <label className="field">
@@ -55,13 +55,13 @@ export default async function ProfilePage() {
                   type="email"
                   defaultValue={profile.public_email ?? ""}
                 />
-                <span>
+                <span className="visibility-toggle">
                   <input
                     name="showEmail"
                     type="checkbox"
                     defaultChecked={profile.show_email}
-                  />{" "}
-                  แสดงอีเมล
+                  />
+                  <b>แสดงอีเมลบนเว็บไซต์</b>
                 </span>
               </label>
               <label className="field full">
