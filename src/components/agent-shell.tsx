@@ -22,10 +22,10 @@ export function AgentShell({ children }: { children: ReactNode }) {
         </Link>
         <nav aria-label="เมนู Agent">
           {AGENT_NAVIGATION.map((item) => (
-            <Link href={item.href} key={item.href}>
+            <a href={item.href} key={item.href}>
               <i aria-hidden><NavIcon icon={item.icon} /></i>
               <span>{item.label}</span>
-            </Link>
+            </a>
           ))}
         </nav>
         <div className="sidebar-bottom">
