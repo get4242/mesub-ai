@@ -884,6 +884,44 @@ button {
   background: #dcf5e8;
   color: #14704f;
 }
+.status-sold {
+  background: #e7eef9;
+  color: #315a88;
+}
+.property-row-sold {
+  border-color: #cbd9ea;
+  background: linear-gradient(90deg, #f8fbff, #fff);
+}
+.property-lifecycle-actions {
+  margin-top: 20px;
+}
+.button-sold {
+  border-color: #245b90;
+  background: #315f91;
+  color: #fff;
+}
+.button-sold:hover { background: #244b76; }
+.sold-property-actions {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #cbd9ea;
+  border-radius: 14px;
+  background: #f6faff;
+  color: #294b70;
+}
+.sold-property-actions b,
+.sold-property-actions span { display: block; }
+.sold-property-actions span { margin-top: 3px; color: #617992; font-size: 13px; }
+.button-danger {
+  border: 1px solid #dc5a5a;
+  background: #fff;
+  color: #b62d2d;
+}
+.button-danger:hover { background: #fff2f2; }
 .status-pending_confirmation {
   background: #eee8ff;
   color: #6b47a5;
@@ -1227,6 +1265,8 @@ button {
   .agent-summary { gap: 8px; }
   .agent-summary span { min-width: calc(33.33% - 6px); flex: 1; padding: 10px; font-size: 12px; }
   .agent-summary b { font-size: 20px; }
+  .sold-property-actions { align-items: stretch; flex-direction: column; }
+  .sold-property-actions .button-danger { width: 100%; }
   .property-tools { flex-wrap: wrap; }
   .property-tools input { flex-basis: 100%; }
   .metric-grid {

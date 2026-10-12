@@ -3,6 +3,8 @@
 import { useState } from "react";
 import {
   archivePropertyAction,
+  deleteSoldPropertyAction,
+  markPropertySoldAction,
   requestPropertyConfirmationAction,
   returnPropertyToDraftAction,
   updatePropertyDraftAction,
@@ -96,6 +98,33 @@ export function PropertyEditor({
     setMessage(
       result.ok ? "อัปเดตสถานะแล้ว" : propertyMutationMessage(result.code),
     );
+  }
+
+  function saleMessage(code: string) {
+    if (code === "CONFLICT") return "ข้อมูลรายการนี้เปลี่ยนแล้ว กรุณาโหลดหน้าใหม่ก่อนทำรายการ";
+    if (code === "HAS_HISTORY") return "ลบไม่ได้ เพราะมีข้อมูลลูกค้าหรือนัดหมายผูกกับทรัพย์นี้อยู่ ประวัติจะถูกเก็บไว้ให้";
+    if (code === "INVALID_STATUS") return "ทำรายการนี้ไม่ได้กับสถานะปัจจุบันของทรัพย์";
+    return "ทำรายการไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+  }
+
+  async function markSold() {
+    if (!window.confirm("ยืนยันว่าทรัพย์นี้ขายแล้ว? ประกาศจะถูกนำออกจากเว็บไซต์ทันที")) return;
+    setPending(true);
+    const result = await markPropertySoldAction(property.id, property.version);
+    setPending(false);
+    setMessage(result.ok ? "บันทึกสถานะขายแล้วเรียบร้อย กรุณาโหลดหน้าเพื่อดูสถานะล่าสุด" : saleMessage(result.code));
+  }
+
+  async function deleteSold() {
+    if (!window.confirm("ลบรายการขายแล้วนี้หรือไม่? รูปภาพและข้อมูลทรัพย์จะถูกลบถาวร")) return;
+    setPending(true);
+    const result = await deleteSoldPropertyAction(property.id, property.version);
+    setPending(false);
+    if (result.ok) {
+      window.location.assign("/dashboard/properties");
+      return;
+    }
+    setMessage(saleMessage(result.code));
   }
 
   async function uploadOne(file: File) {
@@ -259,7 +288,7 @@ export function PropertyEditor({
           </button>
         </footer>
       </form>
-      <div className="actions">
+      <div className="actions property-lifecycle-actions">
         {property.status === "published" ? (
           shareProperty ? <LineFlexShareButton {...shareProperty} /> : null
         ) : null}
@@ -276,11 +305,29 @@ export function PropertyEditor({
             กลับเป็นร่าง
           </button>
         ) : null}
-        <button disabled={pending} onClick={() => transition("archived")}>
-          เก็บเข้าคลัง (ซ่อนทรัพย์)
-        </button>
+        {property.status === "published" ? (
+          <button className="button-sold" disabled={pending} onClick={markSold}>
+            ✓ ขายแล้ว · นำประกาศออกจากเว็บ
+          </button>
+        ) : null}
+        {(property.status === "draft" || property.status === "pending_confirmation") ? (
+          <button disabled={pending} onClick={() => transition("archived")}>
+            เก็บเข้าคลัง (ซ่อนทรัพย์)
+          </button>
+        ) : null}
+        {property.status === "sold" ? (
+          <div className="sold-property-actions">
+            <div>
+              <b>✓ รายการนี้ขายแล้ว</b>
+              <span>ประกาศถูกนำออกจากเว็บไซต์เรียบร้อย</span>
+            </div>
+            <button className="button-danger" disabled={pending} onClick={deleteSold}>
+              ลบรายการขายแล้ว
+            </button>
+          </div>
+        ) : null}
       </div>
-      <p className="hint">แบบร่างยังไม่แสดงต่อสาธารณะ ส่วน “เก็บเข้าคลัง” คือซ่อนทรัพย์ไว้โดยไม่ลบข้อมูลหรือรูปภาพ</p>
+      <p className="hint">แบบร่างยังไม่แสดงต่อสาธารณะ ส่วน “เก็บเข้าคลัง” คือซ่อนทรัพย์ไว้โดยไม่ลบข้อมูลหรือรูปภาพ รายการขายแล้วลบได้เมื่อไม่มีลูกค้าหรือนัดหมายผูกอยู่</p>
       {message ? <p role="status">{message}</p> : null}
       <section className="form-section" id="media">
         <header>

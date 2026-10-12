@@ -97,7 +97,7 @@ export default async function PropertiesPage() {
                 false,
               );
               return (
-                <article className="property-row property-listing-card" key={property.id}>
+                <article className={`property-row property-listing-card ${property.status === "sold" ? "property-row-sold" : ""}`} key={property.id}>
                   {covers.get(property.id) ? (
                     <Image
                       className="property-thumb"
@@ -183,6 +183,14 @@ export default async function PropertiesPage() {
                         />
                         <button>เผยแพร่</button>
                       </form>
+                    ) : null}
+                    {property.status === "sold" ? (
+                      <Link
+                        className="button-secondary"
+                        href={`/dashboard/properties/${property.id}/edit`}
+                      >
+                        จัดการรายการขายแล้ว
+                      </Link>
                     ) : null}
                   </div>
                 </article>
