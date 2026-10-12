@@ -63,16 +63,23 @@ export default async function DashboardPage() {
             <div className="section-head">
               <h2>สิ่งที่ควรทำต่อ</h2>
             </div>
-            <div className="list">
-              <Link className="list-item" href="/dashboard/properties/new">
-                <b>เพิ่มทรัพย์รายการใหม่</b>
-                <br />
-                <span className="muted">เริ่มจากข้อมูลและรูปภาพที่คุณมี</span>
+            <p className="dashboard-action-intro">เลือกสิ่งที่ต้องการทำได้เลย</p>
+            <div className="dashboard-actions">
+              <Link className="dashboard-action dashboard-action-primary" href="/dashboard/properties/new">
+                <span className="dashboard-action-icon" aria-hidden>＋</span>
+                <span>
+                  <b>เพิ่มทรัพย์ใหม่</b>
+                  <small>กรอกข้อมูลและอัปโหลดรูปทรัพย์</small>
+                </span>
+                <span className="dashboard-action-arrow" aria-hidden>→</span>
               </Link>
-              <Link className="list-item" href="/dashboard/properties">
-                <b>ตรวจสถานะทรัพย์</b>
-                <br />
-                <span className="muted">แก้ไข ให้ AI ช่วย หรือเผยแพร่</span>
+              <Link className="dashboard-action" href="/dashboard/properties">
+                <span className="dashboard-action-icon" aria-hidden>⌂</span>
+                <span>
+                  <b>ดูทรัพย์ของฉัน</b>
+                  <small>แก้ไข ใช้ AI หรือเผยแพร่ประกาศ</small>
+                </span>
+                <span className="dashboard-action-arrow" aria-hidden>→</span>
               </Link>
             </div>
           </section>
