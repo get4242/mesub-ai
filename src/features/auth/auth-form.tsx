@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
-import { useRouter } from "next/navigation";
 import type { AuthActionResult } from "./schemas";
 import { Brand } from "@/components/public-shell";
 
@@ -20,7 +19,6 @@ function SubmitButton({ label }: { label: string }) {
 }
 
 export function AuthForm({ mode, action, notice, nextPath = "/dashboard" }: Props) {
-  const router = useRouter();
   const [result, formAction] = useActionState<AuthActionResult | null, FormData>(
     async (_previous, formData) => action(formData),
     null
@@ -28,9 +26,11 @@ export function AuthForm({ mode, action, notice, nextPath = "/dashboard" }: Prop
   const signup = mode === "signup";
   useEffect(() => {
     if (!result?.ok || signup) return;
-    const redirect = window.setTimeout(() => router.replace(nextPath), 750);
+    // A complete navigation makes the new Supabase session cookie available to
+    // the proxy before the dashboard starts prefetching its protected menus.
+    const redirect = window.setTimeout(() => window.location.assign(nextPath), 750);
     return () => window.clearTimeout(redirect);
-  }, [nextPath, result, router, signup]);
+  }, [nextPath, result, signup]);
 
   return (
     <div className="auth-card">
