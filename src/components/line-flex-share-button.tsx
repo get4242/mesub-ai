@@ -29,6 +29,7 @@ export function LineFlexShareButton({
   property: ShareProperty;
 }) {
   const [ready, setReady] = useState(false);
+  const [inLineClient, setInLineClient] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const linkShareUrl = `https://line.me/R/share?text=${encodeURIComponent(`${property.title} ${property.url}`)}`;
@@ -38,6 +39,7 @@ export function LineFlexShareButton({
     try {
       await window.liff.init({ liffId });
       setReady(true);
+      setInLineClient(window.liff.isInClient());
     } catch {
       setMessage("เปิดการเชื่อมต่อ LINE ไม่สำเร็จ จึงแชร์เป็นลิงก์แทนได้");
     }
@@ -45,9 +47,19 @@ export function LineFlexShareButton({
 
   async function share() {
     setMessage("");
-    if (!liffId || !window.liff || !ready || !window.liff.isInClient() || !window.liff.shareTargetPicker) {
+    if (!liffId) {
       window.open(linkShareUrl, "_blank", "noopener,noreferrer");
-      setMessage("หน้านี้ไม่ได้เปิดจาก LINE MINI App จึงแชร์เป็นลิงก์แทน");
+      setMessage("ยังไม่ได้ตั้งค่า LINE MINI App จึงแชร์เป็นลิงก์แทน");
+      return;
+    }
+    if (!window.liff || !ready || !window.liff.isInClient()) {
+      const miniAppUrl = `https://miniapp.line.me/${liffId}${window.location.pathname}${window.location.search}`;
+      window.location.assign(miniAppUrl);
+      setMessage("กำลังเปิดใน LINE MINI App เพื่อให้แชร์เป็น Flex ได้");
+      return;
+    }
+    if (!window.liff.shareTargetPicker) {
+      setMessage("LINE MINI App นี้ยังไม่ได้เปิดสิทธิ์แชร์ข้อความ กรุณาเปิดสิทธิ์ chat_message.write ใน LINE Developers");
       return;
     }
     if (!window.liff.isLoggedIn()) {
@@ -142,8 +154,15 @@ export function LineFlexShareButton({
         />
       ) : null}
       <button className="button-line" type="button" disabled={busy} onClick={share}>
-        {busy ? "กำลังเปิด LINE…" : "แชร์ Flex ใน LINE"}
+        {busy
+          ? "กำลังเปิด LINE…"
+          : inLineClient
+            ? "แชร์ Flex ใน LINE"
+            : liffId
+              ? "เปิด LINE เพื่อแชร์ Flex"
+              : "แชร์ลิงก์ใน LINE"}
       </button>
+      {!inLineClient && liffId ? <p className="hint">กดครั้งแรกเพื่อเปิด MINI App แล้วกดปุ่มนี้อีกครั้งเพื่อเลือกเพื่อนและส่งการ์ด Flex</p> : null}
       {message ? <p role="status" className="hint">{message}</p> : null}
     </div>
   );
