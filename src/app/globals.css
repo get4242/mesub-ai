@@ -787,6 +787,23 @@ button {
 .button-line:hover { background: #05a947; color: #fff; }
 .line-flex-share { display: grid; gap: 4px; }
 .line-flex-share .hint { margin: 0; max-width: 240px; font-size: 12px; }
+.line-session-shell {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 24px;
+  background: linear-gradient(145deg, #eef8f2, #f9fbfa);
+}
+.line-session-card {
+  width: min(100%, 420px);
+  padding: 30px;
+  border: 1px solid #d2e4da;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 16px 46px rgba(12, 72, 47, .12);
+}
+.line-session-card h1 { margin: 10px 0; color: var(--ink); font-size: 26px; }
+.line-session-card p { margin: 0 0 20px; color: var(--muted); line-height: 1.65; }
 .property-slider-main {
   position: relative;
   overflow: hidden;

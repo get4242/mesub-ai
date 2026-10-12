@@ -53,9 +53,10 @@ export function LineFlexShareButton({
       return;
     }
     if (!window.liff || !ready || !window.liff.isInClient()) {
-      const miniAppUrl = `https://miniapp.line.me/${liffId}${window.location.pathname}${window.location.search}`;
+      const returnTo = `${window.location.pathname}${window.location.search}`;
+      const miniAppUrl = `https://miniapp.line.me/${liffId}/line/share?returnTo=${encodeURIComponent(returnTo)}`;
       window.location.assign(miniAppUrl);
-      setMessage("กำลังเปิดใน LINE MINI App เพื่อให้แชร์เป็น Flex ได้");
+      setMessage("กำลังเปิด LINE MINI App และยืนยันการเข้าสู่ระบบก่อนแชร์ Flex");
       return;
     }
     if (!window.liff.shareTargetPicker) {
